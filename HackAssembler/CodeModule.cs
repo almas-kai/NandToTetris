@@ -122,9 +122,7 @@ public class CodeModule
 		}
 		ushort constantValue = ushort.Parse(constant);
 		string binary = Convert.ToString(constantValue, 2);
-		Console.WriteLine(binary);
 		binary = binary.PadLeft(16, '0');
-		Console.WriteLine($"{constant}, {binary}, {binary.Length}");
 		return binary;
 	}
 }
