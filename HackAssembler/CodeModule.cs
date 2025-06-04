@@ -114,4 +114,17 @@ public class CodeModule
 				throw new InvalidOperationException($"Something went wrong. The symbol is unknown. The symbol is {symbol}.");
 		}
 	}
+	public string GetBinaryOfConstant(string constant)
+	{
+		if (Validator.IsCorrectConstant(constant) is false)
+		{
+			throw new InvalidOperationException($"Something went wrong. The constant is not valid. The constant value is {constant}.");
+		}
+		ushort constantValue = ushort.Parse(constant);
+		string binary = Convert.ToString(constantValue, 2);
+		Console.WriteLine(binary);
+		binary = binary.PadLeft(16, '0');
+		Console.WriteLine($"{constant}, {binary}, {binary.Length}");
+		return binary;
+	}
 }

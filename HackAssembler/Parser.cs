@@ -11,6 +11,7 @@ public enum InstructionType
 public class Parser
 {
 	private int _counter = 0;
+	private int _pointer = 0;
 	private string[] _instructions;
 	public InstructionType CurrentInstructionType { get; private set; }
 	public Parser(FileInfo file)
@@ -28,9 +29,10 @@ public class Parser
 	{
 		if (HasMoreLines is false)
 		{
-			throw new InvalidOperationException($"Invalid operation. Can't advance. There is no more instructions to read for. Current instruction number is {_counter}. Current instruction is {_instructions[_counter]}.");
+			throw new InvalidOperationException($"Invalid operation. Can't advance. There is no more instructions to read for. Current instruction number is {_pointer}. Current instruction is {_instructions[_pointer]}.");
 		}
 		char instructionType = _instructions[_counter][0];
+		_pointer = _counter;
 		switch (instructionType)
 		{
 			case '@':
@@ -49,52 +51,52 @@ public class Parser
 	{
 		if (CurrentInstructionType == InstructionType.C_INSTRUCTION)
 		{
-			throw new InvalidOperationException($"Invalid operation. The instruction type is {CurrentInstructionType}. But it has to be {InstructionType.C_INSTRUCTION}. Can't extract the symbol or decimal value from this type of instruction. Current instruction number is {_counter}. Current instruction is {_instructions[_counter]}.");
+			throw new InvalidOperationException($"Invalid operation. The instruction type is {CurrentInstructionType}. But it has to be {InstructionType.C_INSTRUCTION}. Can't extract the symbol or decimal value from this type of instruction. Current instruction number is {_pointer}. Current instruction is {_instructions[_pointer]}.");
 		}
-		string currentInstruction = _instructions[_counter];
+		string currentInstruction = _instructions[_pointer];
 		if (currentInstruction.StartsWith("(") && currentInstruction.EndsWith(")"))
 		{
 			string symbol = currentInstruction.Substring(1, currentInstruction.Length - 2);
-			if (IsCorrectSymbol(symbol))
+			if (Validator.IsCorrectSymbol(symbol))
 			{
 				return symbol;
 			}
 			else
 			{
-				throw new InvalidOperationException($"Invalid operation. The instruction type is {CurrentInstructionType}. Couldn't extract the symbol, because the format was incorrect. Current instruction number is {_counter}. Current instruction is {_instructions[_counter]}.");
+				throw new InvalidOperationException($"Invalid operation. The instruction type is {CurrentInstructionType}. Couldn't extract the symbol, because the format was incorrect. Current instruction number is {_pointer}. Current instruction is {_instructions[_pointer]}.");
 			}
 		}
 		else if (currentInstruction.StartsWith("@"))
 		{
 			string address = currentInstruction.Substring(1);
-			if (IsCorrectConstant(address) || IsCorrectSymbol(address))
+			if (Validator.IsCorrectConstant(address) || Validator.IsCorrectSymbol(address))
 			{
 				return address;
 			}
 			else
 			{
-				throw new InvalidOperationException($"Invalid operation. The instruction type is {CurrentInstructionType}. Couldn't extract the underlying symbol or decimal value, because the format was incorrect. The current instruction number is {_counter}. The current instruction is {_instructions[_counter]}.");
+				throw new InvalidOperationException($"Invalid operation. The instruction type is {CurrentInstructionType}. Couldn't extract the underlying symbol or decimal value, because the format was incorrect. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
 			}
 		}
 		else
 		{
-			throw new InvalidOperationException($"Something went wrong. The current instruction type is {CurrentInstructionType}. The current instruction number is {_counter}. The current instruction is: {_instructions[_counter]}.");
+			throw new InvalidOperationException($"Something went wrong. The current instruction type is {CurrentInstructionType}. The current instruction number is {_pointer}. The current instruction is: {_instructions[_pointer]}.");
 		}
 	}
 	public string Destination()
 	{
 		if (CurrentInstructionType != InstructionType.C_INSTRUCTION)
 		{
-			throw new InvalidOperationException($"Invalid operation. The instruction type is {CurrentInstructionType}. But it has to be {InstructionType.C_INSTRUCTION}. Can't extract the destination part from this type of the instruction. The current instruction number is {_counter}. The current instruction is {_instructions[_counter]}.");
+			throw new InvalidOperationException($"Invalid operation. The instruction type is {CurrentInstructionType}. But it has to be {InstructionType.C_INSTRUCTION}. Can't extract the destination part from this type of the instruction. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
 		}
-		string destination = _instructions[_counter];
+		string destination = _instructions[_pointer];
 		if (destination.Contains("="))
 		{
 			int index = destination.IndexOf("=");
 			destination = destination.Substring(0, index);
 			if (Regex.IsMatch(destination, @"^(A|D|M|AD|AM|DM|ADM)$") is false)
 			{
-				throw new InvalidOperationException($"Invalid operation. The destination part is not correct. The destination part is {destination}. The instruction number is {_counter}. The instruction is {_instructions[_counter]}.");
+				throw new InvalidOperationException($"Invalid operation. The destination part is not correct. The destination part is {destination}. The instruction number is {_pointer}. The instruction is {_instructions[_pointer]}.");
 			}
 		}
 		else
@@ -107,15 +109,15 @@ public class Parser
 	{
 		if (CurrentInstructionType != InstructionType.C_INSTRUCTION)
 		{
-			throw new InvalidOperationException($"Invalid operation. The instruction type is {CurrentInstructionType}. But it has to be {InstructionType.C_INSTRUCTION}. Can't extract the computational part. The current instruction type is {_counter}. The current instruction is {_instructions[_counter]}.");
+			throw new InvalidOperationException($"Invalid operation. The instruction type is {CurrentInstructionType}. But it has to be {InstructionType.C_INSTRUCTION}. Can't extract the computational part. The current instruction type is {_pointer}. The current instruction is {_instructions[_pointer]}.");
 		}
-		string computational = _instructions[_counter];
+		string computational = _instructions[_pointer];
 		if (computational.Contains("="))
 		{
 			Match match = Regex.Match(computational, @"=(.*?)(?:;|$)");
 			if (match.Success is false)
 			{
-				throw new InvalidOperationException($"Something went wrong. The syntax was incorrect. Tried to capture the computational part after the '=' sign but couldn't do it. The current instruction type is {CurrentInstructionType}. The current instruction number is {_counter}. The current instruction is {_instructions[_counter]}.");
+				throw new InvalidOperationException($"Something went wrong. The syntax was incorrect. Tried to capture the computational part after the '=' sign but couldn't do it. The current instruction type is {CurrentInstructionType}. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
 			}
 			computational = match.Groups[1].Value;
 		}
@@ -130,9 +132,9 @@ public class Parser
 	{
 		if (CurrentInstructionType != InstructionType.C_INSTRUCTION)
 		{
-			throw new InvalidOperationException($"Invalid operation. Instruction type error. The current instruction type is {CurrentInstructionType}. But it has to be {InstructionType.C_INSTRUCTION}. Can't extract the 'jump' part. The current instruction number is {_counter}. The current instruction is {_instructions[_counter]}.");
+			throw new InvalidOperationException($"Invalid operation. Instruction type error. The current instruction type is {CurrentInstructionType}. But it has to be {InstructionType.C_INSTRUCTION}. Can't extract the 'jump' part. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
 		}
-		string jump = _instructions[_counter];
+		string jump = _instructions[_pointer];
 		if (jump.Contains(";"))
 		{
 			int startIndex = jump.IndexOf(";");
@@ -140,7 +142,7 @@ public class Parser
 		}
 		else
 		{
-			throw new InvalidOperationException($"Something went wrong. There is no jump instruction to extract. The syntax is incorrect. The current instruction type is {CurrentInstructionType}. The current instruction number is {_counter}. The current instruction is {_instructions[_counter]}.");
+			jump = "";
 		}
 		return jump;
 	}
@@ -150,17 +152,5 @@ public class Parser
 		{
 			return _counter < _instructions.Length;
 		}
-	}
-	private bool IsCorrectSymbol(string symbol)
-	{
-		return Regex.IsMatch(symbol, @"^[a-zA-Z._$:][a-zA-Z0-9._$:]*$");
-	}
-	private bool IsCorrectConstant(string constant)
-	{
-		if (ushort.TryParse(constant, out ushort number))
-		{
-			return 0 <= number && 32767 >= number;
-		}
-		return false;
 	}
 }
