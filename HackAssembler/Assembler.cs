@@ -54,7 +54,6 @@ public class Assembler
 						streamWriter.WriteLine(output);
 					}
 				}
-
 			}
 		}
 	}
