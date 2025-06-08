@@ -88,7 +88,6 @@ public class Parser
 		else if (currentInstruction.StartsWith("@"))
 		{
 			string address = currentInstruction.Substring(1);
-			Console.WriteLine($"Incoming: {address}");
 			if (_predefinedSymbols.TryGetValue(address, out int predefinedValue))
 			{
 				return predefinedValue.ToString();

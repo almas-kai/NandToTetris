@@ -19,39 +19,42 @@ public class Assembler
 			{
 				Console.WriteLine("The file doesn't exist. Or you don't have the permission to read the file.");
 			}
-			FileInfo inputFile = new FileInfo(path);
-			Parser parser = new Parser(inputFile);
-			CodeModule codeModule = new CodeModule();
-
-			string outputFile = inputFile.FullName.Replace(".asm", "") + ".hack";
-			using (StreamWriter streamWriter = new StreamWriter(outputFile))
+			else
 			{
-				while (parser.HasMoreLines)
+				FileInfo inputFile = new FileInfo(path);
+				Parser parser = new Parser(inputFile);
+				CodeModule codeModule = new CodeModule();
+
+				string outputFile = inputFile.FullName.Replace(".asm", "") + ".hack";
+				using (StreamWriter streamWriter = new StreamWriter(outputFile))
 				{
-					parser.Advance();
-					InstructionType instructionType = parser.CurrentInstructionType;
-					if (instructionType is InstructionType.A_INSTRUCTION || instructionType is InstructionType.L_INSTRUCTION)
+					while (parser.HasMoreLines)
 					{
-						string symbol = parser.Symbol();
-						string binarySymbol = codeModule.GetBinaryOfConstant(symbol);
-						streamWriter.WriteLine(binarySymbol);
-					}
-					else
-					{
-						string output = "111";
-						string symbolicComputational = parser.Computation();
-						string binaryComputational = codeModule.Computational(symbolicComputational);
-						output += binaryComputational;
+						parser.Advance();
+						InstructionType instructionType = parser.CurrentInstructionType;
+						if (instructionType is InstructionType.A_INSTRUCTION || instructionType is InstructionType.L_INSTRUCTION)
+						{
+							string symbol = parser.Symbol();
+							string binarySymbol = codeModule.GetBinaryOfConstant(symbol);
+							streamWriter.WriteLine(binarySymbol);
+						}
+						else
+						{
+							string output = "111";
+							string symbolicComputational = parser.Computation();
+							string binaryComputational = codeModule.Computational(symbolicComputational);
+							output += binaryComputational;
 
-						string symbolicDestination = parser.Destination();
-						string binaryDestination = codeModule.Destination(symbolicDestination);
-						output += binaryDestination;
+							string symbolicDestination = parser.Destination();
+							string binaryDestination = codeModule.Destination(symbolicDestination);
+							output += binaryDestination;
 
-						string symbolicJump = parser.Jump();
-						string binaryJump = codeModule.Jump(symbolicJump);
-						output += binaryJump;
+							string symbolicJump = parser.Jump();
+							string binaryJump = codeModule.Jump(symbolicJump);
+							output += binaryJump;
 
-						streamWriter.WriteLine(output);
+							streamWriter.WriteLine(output);
+						}
 					}
 				}
 			}
