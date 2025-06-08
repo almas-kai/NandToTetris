@@ -39,13 +39,17 @@ public class Parser
 		{
 			throw new InvalidOperationException($"Invalid operation. Can't advance. There is no more instructions to read for. Current instruction number is {_pointer}. Current instruction is {_instructions[_pointer]}.");
 		}
+		if (_counter == 8)
+		{
+			
+		}
 		string instructionType = _instructions[_counter];
 		_pointer = _counter;
 		if (instructionType.StartsWith("@"))
 		{
 			CurrentInstructionType = InstructionType.A_INSTRUCTION;
 			instructionType = instructionType.Substring(1);
-			if (_isSymbolPopulating is false && _symbolTable.ContainsKey(instructionType) is false && Validator.IsCorrectSymbol(instructionType))
+			if (_isSymbolPopulating is false && _symbolTable.ContainsKey(instructionType) is false && Validator.IsCorrectSymbol(instructionType) && _predefinedSymbols.ContainsKey(instructionType) is false)
 			{
 				_symbolTable.Add(instructionType, _variablePointer);
 				_variablePointer++;
@@ -68,24 +72,7 @@ public class Parser
 			throw new InvalidOperationException($"Invalid operation. The instruction type is {CurrentInstructionType}. But it has to be {InstructionType.C_INSTRUCTION}. Can't extract the symbol or decimal value from this type of instruction. Current instruction number is {_pointer}. Current instruction is {_instructions[_pointer]}.");
 		}
 		string currentInstruction = _instructions[_pointer];
-		if (currentInstruction.StartsWith("(") && currentInstruction.EndsWith(")"))
-		{
-			string symbol = currentInstruction.Substring(1, currentInstruction.Length - 2);
-
-			if (_symbolTable.TryGetValue(symbol, out int variable))
-			{
-				return variable.ToString();
-			}
-			else if (Validator.IsCorrectSymbol(symbol))
-			{
-				return symbol;
-			}
-			else
-			{
-				throw new InvalidOperationException($"Invalid operation. The instruction type is {CurrentInstructionType}. Couldn't extract the symbol, because the format was incorrect. Current instruction number is {_pointer}. Current instruction is {_instructions[_pointer]}.");
-			}
-		}
-		else if (currentInstruction.StartsWith("@"))
+		if (currentInstruction.StartsWith("@"))
 		{
 			string address = currentInstruction.Substring(1);
 			if (_predefinedSymbols.TryGetValue(address, out int predefinedValue))
@@ -164,7 +151,7 @@ public class Parser
 		string jump = _instructions[_pointer];
 		if (jump.Contains(";"))
 		{
-			int startIndex = jump.IndexOf(";");
+			int startIndex = jump.IndexOf(";") + 1;
 			jump = jump.Substring(startIndex);
 		}
 		else
@@ -180,29 +167,40 @@ public class Parser
 			return _counter < _instructions.Length;
 		}
 	}
+	public bool IsLoopLabel()
+	{
+		string currentInstruction = _instructions[_pointer];
+		if (currentInstruction.StartsWith("(") && currentInstruction.EndsWith(")"))
+		{
+			currentInstruction = currentInstruction.Substring(1, currentInstruction.Length - 2);
+			if (_symbolTable.ContainsKey(currentInstruction))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 	private void PopulateSymbolTable()
 	{
+		// Remove loop labels from the instructions array.
 		if (_counter != 0)
 		{
 			throw new InvalidOperationException($"Something went wrong. The symbol table must be populated before the read of any other instructions. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
 		}
-		if (HasMoreLines)
+		while (HasMoreLines)
 		{
 			Advance();
 			string instruction = _instructions[_pointer];
 			if (instruction.StartsWith("(") && instruction.EndsWith(")"))
 			{
 				string label = instruction.Substring(1, instruction.Length - 2);
-				if (Validator.IsCorrectConstant(label) is false)
+				if (Validator.IsCorrectSymbol(label) is true)
 				{
-					if (Validator.IsCorrectSymbol(label) is true)
-					{
-						_symbolTable.Add(label, _pointer);
-					}
-					else
-					{
-						throw new InvalidOperationException($"Something went wrong. The label symbol was in incorrect format. The label symbol was {label}. The instruction number is {_pointer}. The whole instruction is {_instructions[_pointer]}.");
-					}
+					_symbolTable.Add(label, _pointer);
+				}
+				else
+				{
+					throw new InvalidOperationException($"Something went wrong. The label symbol was in incorrect format. The label symbol was {label}. The instruction number is {_pointer}. The whole instruction is {_instructions[_pointer]}.");
 				}
 			}
 		}

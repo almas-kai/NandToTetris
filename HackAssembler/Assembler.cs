@@ -32,13 +32,13 @@ public class Assembler
 					{
 						parser.Advance();
 						InstructionType instructionType = parser.CurrentInstructionType;
-						if (instructionType is InstructionType.A_INSTRUCTION || instructionType is InstructionType.L_INSTRUCTION)
+						if (instructionType is InstructionType.A_INSTRUCTION || instructionType is InstructionType.L_INSTRUCTION && parser.IsLoopLabel() is false)
 						{
 							string symbol = parser.Symbol();
 							string binarySymbol = codeModule.GetBinaryOfConstant(symbol);
 							streamWriter.WriteLine(binarySymbol);
 						}
-						else
+						else if(instructionType is InstructionType.C_INSTRUCTION)
 						{
 							string output = "111";
 							string symbolicComputational = parser.Computation();
