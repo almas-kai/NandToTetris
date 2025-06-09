@@ -20,18 +20,38 @@ public class Parser
 		{ "R0", 0 }, { "R1", 1 }, { "R2", 2 }, { "R3", 3 }, { "R4", 4 }, { "R5", 5 }, { "R6", 6 }, { "R7", 7 }, { "R8", 8 }, { "R9", 9 }, { "R10", 10 }, { "R11", 11 }, { "R12", 12 }, { "R13", 13 }, { "R14", 14 }, { "R15", 15 }, { "SP", 0 }, { "LCL", 1 }, { "ARG", 2 }, { "THIS", 3 }, { "THAT", 4 }, { "SCREEN", 16384 }, { "KBD", 24576 }
 	};
 	private int _variablePointer = 16;
-	private bool _isSymbolPopulating = true;
 	public Parser(FileInfo file)
 	{
 		using (StreamReader _streamReader = file.OpenText())
 		{
+			int offset = 0;
 			_instructions = _streamReader.ReadToEnd()
 				.Split("\n")
 				.Where(instruction => Regex.IsMatch(instruction, @"^\s*(//.*)?$") is false)
 				.Select(instruction => Regex.Replace(instruction, @"\s", ""))
+				.Where((instruction, index) =>
+				{
+					if (instruction.StartsWith("(") && instruction.EndsWith(")"))
+					{
+						string label = instruction.Substring(1, instruction.Length - 2);
+						if (Validator.IsCorrectSymbol(label))
+						{
+							_symbolTable.Add(label, index - offset);
+							offset++;
+						}
+						else
+						{
+							throw new InvalidOperationException($"Something went wrong on the first parsing phase. The index is {index}. The label is {instruction}.");
+						}
+						return false;
+					}
+					else
+					{
+						return true;
+					}
+				})
 				.ToArray();
 		}
-		PopulateSymbolTable();
 	}
 	public void Advance()
 	{
@@ -39,17 +59,13 @@ public class Parser
 		{
 			throw new InvalidOperationException($"Invalid operation. Can't advance. There is no more instructions to read for. Current instruction number is {_pointer}. Current instruction is {_instructions[_pointer]}.");
 		}
-		if (_counter == 8)
-		{
-			
-		}
 		string instructionType = _instructions[_counter];
 		_pointer = _counter;
 		if (instructionType.StartsWith("@"))
 		{
 			CurrentInstructionType = InstructionType.A_INSTRUCTION;
 			instructionType = instructionType.Substring(1);
-			if (_isSymbolPopulating is false && _symbolTable.ContainsKey(instructionType) is false && Validator.IsCorrectSymbol(instructionType) && _predefinedSymbols.ContainsKey(instructionType) is false)
+			if (_symbolTable.ContainsKey(instructionType) is false && Validator.IsCorrectSymbol(instructionType) && _predefinedSymbols.ContainsKey(instructionType) is false)
 			{
 				_symbolTable.Add(instructionType, _variablePointer);
 				_variablePointer++;
@@ -179,33 +195,5 @@ public class Parser
 			}
 		}
 		return false;
-	}
-	private void PopulateSymbolTable()
-	{
-		// Remove loop labels from the instructions array.
-		if (_counter != 0)
-		{
-			throw new InvalidOperationException($"Something went wrong. The symbol table must be populated before the read of any other instructions. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
-		}
-		while (HasMoreLines)
-		{
-			Advance();
-			string instruction = _instructions[_pointer];
-			if (instruction.StartsWith("(") && instruction.EndsWith(")"))
-			{
-				string label = instruction.Substring(1, instruction.Length - 2);
-				if (Validator.IsCorrectSymbol(label) is true)
-				{
-					_symbolTable.Add(label, _pointer);
-				}
-				else
-				{
-					throw new InvalidOperationException($"Something went wrong. The label symbol was in incorrect format. The label symbol was {label}. The instruction number is {_pointer}. The whole instruction is {_instructions[_pointer]}.");
-				}
-			}
-		}
-		_counter = 0;
-		_pointer = 0;
-		_isSymbolPopulating = false;
 	}
 }
