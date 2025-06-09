@@ -124,7 +124,7 @@ public class Parser
 		{
 			int index = destination.IndexOf("=");
 			destination = destination.Substring(0, index);
-			if (Regex.IsMatch(destination, @"^(A|D|M|AD|AM|DM|ADM)$") is false)
+			if (Regex.IsMatch(destination, @"^(A|D|M|AD|AM|DM|MD|ADM)$") is false)
 			{
 				throw new InvalidOperationException($"Invalid operation. The destination part is not correct. The destination part is {destination}. The instruction number is {_pointer}. The instruction is {_instructions[_pointer]}.");
 			}

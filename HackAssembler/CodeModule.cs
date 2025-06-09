@@ -12,7 +12,7 @@ public class CodeModule
 				return "001";
 			case "D":
 				return "010";
-			case "DM":
+			case "DM" or "MD":
 				return "011";
 			case "A":
 				return "100";
