@@ -3,6 +3,7 @@ namespace VMTranslator;
 
 public class CodeWriter
 {
+	private int _labelID = 0;
 	public string WriteArithmetic(string command)
 	{
 		switch (command)
@@ -185,8 +186,9 @@ public class CodeWriter
 	private string Equal()
 	{
 		string assembly = "// <- BEGIN EQUAL -> \n";
-		(string, string) notEqual = ("@NOT_EQUAL\n", "(NOT_EQUAL)\n");
-		(string, string) endNotEqual = ("@END_NOT_EQUAL\n", "(END_NOT_EQUAL)\n");
+		(string, string) notEqual = ($"@NOT_EQUAL_{_labelID}\n", $"(NOT_EQUAL_{_labelID})\n");
+		(string, string) endNotEqual = ($"@END_NOT_EQUAL_{_labelID}\n", $"(END_NOT_EQUAL_{_labelID})\n");
+		_labelID++;
 
 		assembly += Pop();
 		assembly += Pop("D=D-M\n");
@@ -208,8 +210,9 @@ public class CodeWriter
 	private string GreaterThan()
 	{
 		string assembly = "// <- BEGIN GREATER THAN -> \n";
-		(string, string) greater = ("@GREATER\n", "(GREATER)\n");
-		(string, string) endGreater = ("@END_GREATER\n", "(END_GREATER)\n");
+		(string, string) greater = ($"@GREATER_{_labelID}\n", $"(GREATER_{_labelID})\n");
+		(string, string) endGreater = ($"@END_GREATER_{_labelID}\n", $"(END_GREATER_{_labelID})\n");
+		_labelID++;
 
 		assembly += Pop();
 		assembly += Pop("D=D-M\n");
@@ -231,8 +234,9 @@ public class CodeWriter
 	private string LessThan()
 	{
 		string assembly = "// <- BEGIN LESS THAN -> \n";
-		(string, string) less = ("@LESS\n", "(LESS)\n");
-		(string, string) endLess = ("@END_LESS\n", "(END_LESS)\n");
+		(string, string) less = ($"@LESS_{_labelID}\n", $"(LESS_{_labelID})\n");
+		(string, string) endLess = ($"@END_LESS_{_labelID}\n", $"(END_LESS_{_labelID})\n");
+		_labelID++;
 
 		assembly += Pop();
 		assembly += Pop("D=D-M\n");
