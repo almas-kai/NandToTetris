@@ -36,23 +36,22 @@ public class Parser
 	}
 	public void Advance()
 	{
-		if (HasMoreLines() is false)
-		{
-			throw new InvalidOperationException($"Parser error. Cannot advance, there are no instructions to execute. The current instruction number is {_pointer}.");
-		}
 		_pointer++;
-		string command = _instructions[_pointer];
-		if (command.StartsWith("push"))
+		if (HasMoreLines() is true)
 		{
-			CurrentCommandType = CommandType.C_PUSH;
-		}
-		else if (command.StartsWith("pop"))
-		{
-			CurrentCommandType = CommandType.C_POP;
-		}
-		else if (Regex.IsMatch(command, @"^(add|sub|neg|eq|gt|lt|and|or|not)$"))
-		{
-			CurrentCommandType = CommandType.C_ARITHMETIC;
+			string command = _instructions[_pointer];
+			if (command.StartsWith("push"))
+			{
+				CurrentCommandType = CommandType.C_PUSH;
+			}
+			else if (command.StartsWith("pop"))
+			{
+				CurrentCommandType = CommandType.C_POP;
+			}
+			else if (Regex.IsMatch(command, @"^(add|sub|neg|eq|gt|lt|and|or|not)$"))
+			{
+				CurrentCommandType = CommandType.C_ARITHMETIC;
+			}
 		}
 	}
 	public string GetArg1()

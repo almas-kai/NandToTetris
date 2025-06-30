@@ -23,8 +23,42 @@ class Program
             {
                 FileInfo inputFile = new FileInfo(path);
                 string outputFile = inputFile.FullName.Replace(".vm", ".asm");
+                Parser parser = new Parser(inputFile);
+                CodeWriter codeWriter = new CodeWriter();
                 using (StreamWriter streamWriter = new StreamWriter(outputFile))
                 {
+                    parser.Advance();
+                    while (parser.HasMoreLines())
+                    {
+                        CommandType commandType = parser.CurrentCommandType;
+                        if (commandType is not CommandType.C_RETURN)
+                        {
+                            string arg1 = parser.GetArg1();
+                            if (commandType is CommandType.C_PUSH || commandType is CommandType.C_POP || commandType is CommandType.C_FUNCTION || commandType is CommandType.C_CALL)
+                            {
+                                string arg2 = parser.GetArg2();
+                                if (commandType is CommandType.C_PUSH || commandType is CommandType.C_POP)
+                                {
+                                    if (int.TryParse(arg2, out int index))
+                                    {
+                                        string asmCode = codeWriter.WritePushPop(commandType, arg1, index, inputFile.Name.Replace(".vm", ""));
+                                        streamWriter.WriteLine(asmCode);
+                                    }
+                                    else
+                                    {
+                                        throw new InvalidOperationException($"Translator error. The index is not and integer: {arg2}.");
+                                    }
+                                }
+                            }
+                            else if (commandType is CommandType.C_ARITHMETIC)
+                            {
+                                string asmCode = codeWriter.WriteArithmetic(arg1);
+                                streamWriter.WriteLine(asmCode);
+                            }
+                        }
+                        parser.Advance();
+                    }
+                    streamWriter.WriteLine(codeWriter.EndProgram());
                 }
             }
         }
