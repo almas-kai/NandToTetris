@@ -43,6 +43,14 @@ public class CodeWriter
 		switch (segment)
 		{
 			case "argument" or "local" or "this" or "that":
+				segment = segment switch
+				{
+					"argument" => "ARG",
+					"local" => "LCL",
+					"this" => "THIS",
+					"that" => "THAT",
+					_ => throw new InvalidOperationException($"Code writer error. Invalid segment: {segment}.")
+				};
 				return SegmentPopPush(segment, index, commandType);
 			case "pointer":
 				segment = index == 0 ? "this" : "that";
@@ -92,12 +100,16 @@ public class CodeWriter
 				tempAssembly += "// <- END TEMP PUSH/POP -> \n";
 				return tempAssembly;
 			case "constant":
-				string constantAssembly = "// <- BEGIN CONSTANT PUSH/POP -> \n";
-				constantAssembly += $"@{index}\n";
-				constantAssembly += "D=A\n";
-				constantAssembly += Push();
-				constantAssembly += "// <- END CONSTANT PUSH/POP -> \n";
-				return constantAssembly;
+				if (commandType is CommandType.C_PUSH)
+				{
+					string constantAssembly = "// <- BEGIN CONSTANT PUSH/POP -> \n";
+					constantAssembly += $"@{index}\n";
+					constantAssembly += "D=A\n";
+					constantAssembly += Push();
+					constantAssembly += "// <- END CONSTANT PUSH/POP -> \n";
+					return constantAssembly;
+				}
+				throw new InvalidOperationException("Code writer error. Cannot unrecognized command for the constant segment.");
 			case "static":
 				string staticAssembly = "// <- BEGIN STATIC PUSH/POP -> \n";
 				string staticLabel = $"{fileName}.{index}";
@@ -127,7 +139,6 @@ public class CodeWriter
 		assembly += $"@{index}\n";
 		assembly += "D=A\n";
 		assembly += $"@{segment}\n";
-		assembly += "A=M\n";
 		assembly += "D=D+M\n";
 		assembly += "@R13\n";
 		assembly += "M=D\n";
