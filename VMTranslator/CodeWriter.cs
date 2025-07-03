@@ -53,7 +53,7 @@ public class CodeWriter
 				};
 				return SegmentPopPush(segment, index, commandType);
 			case "pointer":
-				segment = index == 0 ? "this" : "that";
+				segment = index == 0 ? "THIS" : "THAT";
 
 				string pointerAssembly = "// <- POINTER PUSH/POP BEGIN -> \n";
 				if (commandType is CommandType.C_PUSH)
