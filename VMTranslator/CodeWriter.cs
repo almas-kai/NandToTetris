@@ -131,6 +131,39 @@ public class CodeWriter
 				throw new InvalidOperationException($"Code writer error. Inappropriate segment type: {segment}.");
 		}
 	}
+	public string writeLabel(string label)
+	{
+		string asmCode = "// <- BEGIN LABEL ->\n";
+
+		asmCode += $"({label.ToUpper()})\n";
+
+		asmCode += "// <- END LABEL ->\n";
+
+		return asmCode;
+	}
+	public string writeGoto(string label)
+	{
+		string asmCode = "// <- BEGIN GOTO ->\n";
+
+		asmCode += $"@{label}\n";
+		asmCode += "0;JMP\n";
+
+		asmCode += "// <- END GOTO ->\n";
+
+		return asmCode;
+	}
+	public string writeIf(string label)
+	{
+		string asmCode = "// <- BEGIN GOTO ->\n";
+
+		asmCode += Pop();
+		asmCode += $"@{label}\n";
+		asmCode += "D;JNE\n";
+
+		asmCode += "// <- END GOTO ->\n";
+		
+		return asmCode;
+	}
 	private string SegmentPopPush(string segment, int index, CommandType commandType)
 	{
 		string command = commandType.ToString().Substring(2).ToLower();
@@ -332,8 +365,11 @@ public class CodeWriter
 	{
 		string assembly = "// <- BEGIN END PROGRAM -> \n";
 
-		assembly += "(END)\n";
-		assembly += "@END\n";
+		assembly += $"(END_{_labelID})\n";
+		assembly += $"@END_{_labelID}\n";
+
+		_labelID++;
+
 		assembly += "0;JMP\n";
 
 		assembly += "// <- END END PROGRAM -> \n";

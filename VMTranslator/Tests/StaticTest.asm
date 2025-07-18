@@ -148,8 +148,8 @@ M=M+1
 // <- END ADD -> 
 
 // <- BEGIN END PROGRAM -> 
-(END)
-@END
+(END_0)
+@END_0
 0;JMP
 // <- END END PROGRAM -> 
 

@@ -1,273 +1,3 @@
-// <- BEGIN CONSTANT PUSH/POP -> 
-@10
-D=A
-// <- BEGIN PUSH -> 
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// <- END PUSH -> 
-// <- END CONSTANT PUSH/POP -> 
-
-// <- BEGIN LCL PUSH/POP -> 
-@0
-D=A
-@LCL
-D=D+M
-@R13
-M=D
-// <- BEGIN POP -> 
-@SP
-M=M-1
-A=M
-D=M
-// <- END POP -> 
-@R13
-A=M
-M=D
-// <- END LCL PUSH/POP -> 
-
-// <- BEGIN CONSTANT PUSH/POP -> 
-@21
-D=A
-// <- BEGIN PUSH -> 
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// <- END PUSH -> 
-// <- END CONSTANT PUSH/POP -> 
-
-// <- BEGIN CONSTANT PUSH/POP -> 
-@22
-D=A
-// <- BEGIN PUSH -> 
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// <- END PUSH -> 
-// <- END CONSTANT PUSH/POP -> 
-
-// <- BEGIN ARG PUSH/POP -> 
-@2
-D=A
-@ARG
-D=D+M
-@R13
-M=D
-// <- BEGIN POP -> 
-@SP
-M=M-1
-A=M
-D=M
-// <- END POP -> 
-@R13
-A=M
-M=D
-// <- END ARG PUSH/POP -> 
-
-// <- BEGIN ARG PUSH/POP -> 
-@1
-D=A
-@ARG
-D=D+M
-@R13
-M=D
-// <- BEGIN POP -> 
-@SP
-M=M-1
-A=M
-D=M
-// <- END POP -> 
-@R13
-A=M
-M=D
-// <- END ARG PUSH/POP -> 
-
-// <- BEGIN CONSTANT PUSH/POP -> 
-@36
-D=A
-// <- BEGIN PUSH -> 
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// <- END PUSH -> 
-// <- END CONSTANT PUSH/POP -> 
-
-// <- BEGIN THIS PUSH/POP -> 
-@6
-D=A
-@THIS
-D=D+M
-@R13
-M=D
-// <- BEGIN POP -> 
-@SP
-M=M-1
-A=M
-D=M
-// <- END POP -> 
-@R13
-A=M
-M=D
-// <- END THIS PUSH/POP -> 
-
-// <- BEGIN CONSTANT PUSH/POP -> 
-@42
-D=A
-// <- BEGIN PUSH -> 
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// <- END PUSH -> 
-// <- END CONSTANT PUSH/POP -> 
-
-// <- BEGIN CONSTANT PUSH/POP -> 
-@45
-D=A
-// <- BEGIN PUSH -> 
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// <- END PUSH -> 
-// <- END CONSTANT PUSH/POP -> 
-
-// <- BEGIN THAT PUSH/POP -> 
-@5
-D=A
-@THAT
-D=D+M
-@R13
-M=D
-// <- BEGIN POP -> 
-@SP
-M=M-1
-A=M
-D=M
-// <- END POP -> 
-@R13
-A=M
-M=D
-// <- END THAT PUSH/POP -> 
-
-// <- BEGIN THAT PUSH/POP -> 
-@2
-D=A
-@THAT
-D=D+M
-@R13
-M=D
-// <- BEGIN POP -> 
-@SP
-M=M-1
-A=M
-D=M
-// <- END POP -> 
-@R13
-A=M
-M=D
-// <- END THAT PUSH/POP -> 
-
-// <- BEGIN CONSTANT PUSH/POP -> 
-@510
-D=A
-// <- BEGIN PUSH -> 
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// <- END PUSH -> 
-// <- END CONSTANT PUSH/POP -> 
-
-// <- BEGIN TEMP PUSH/POP -> 
-@5
-D=A
-@6
-D=D+A
-@R13
-M=D
-// <- BEGIN POP -> 
-@SP
-M=M-1
-A=M
-D=M
-// <- END POP -> 
-@R13
-A=M
-M=D
-// <- END TEMP PUSH/POP -> 
-
-// <- BEGIN LCL PUSH/POP -> 
-@0
-D=A
-@LCL
-D=D+M
-@R13
-M=D
-@R13
-A=M
-D=M
-// <- BEGIN PUSH -> 
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// <- END PUSH -> 
-// <- END LCL PUSH/POP -> 
-
-// <- BEGIN THAT PUSH/POP -> 
-@5
-D=A
-@THAT
-D=D+M
-@R13
-M=D
-@R13
-A=M
-D=M
-// <- BEGIN PUSH -> 
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// <- END PUSH -> 
-// <- END THAT PUSH/POP -> 
-
-// <- BEGIN ADD -> 
-// <- BEGIN POP -> 
-@SP
-M=M-1
-A=M
-D=M
-// <- END POP -> 
-// <- BEGIN POP -> 
-@SP
-M=M-1
-A=M
-D=D+M
-// <- END POP -> 
-// <- BEGIN PUSH -> 
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// <- END PUSH -> 
-// <- END ADD -> 
-
 // <- BEGIN ARG PUSH/POP -> 
 @1
 D=A
@@ -286,6 +16,108 @@ M=D
 M=M+1
 // <- END PUSH -> 
 // <- END ARG PUSH/POP -> 
+
+// <- POINTER PUSH/POP BEGIN -> 
+// <- BEGIN POP -> 
+@SP
+M=M-1
+A=M
+D=M
+// <- END POP -> 
+@THAT
+M=D
+// <- POINTER PUSH/POP END -> 
+
+// <- BEGIN CONSTANT PUSH/POP -> 
+@0
+D=A
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+// <- END CONSTANT PUSH/POP -> 
+
+// <- BEGIN THAT PUSH/POP -> 
+@0
+D=A
+@THAT
+D=D+M
+@R13
+M=D
+// <- BEGIN POP -> 
+@SP
+M=M-1
+A=M
+D=M
+// <- END POP -> 
+@R13
+A=M
+M=D
+// <- END THAT PUSH/POP -> 
+
+// <- BEGIN CONSTANT PUSH/POP -> 
+@1
+D=A
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+// <- END CONSTANT PUSH/POP -> 
+
+// <- BEGIN THAT PUSH/POP -> 
+@1
+D=A
+@THAT
+D=D+M
+@R13
+M=D
+// <- BEGIN POP -> 
+@SP
+M=M-1
+A=M
+D=M
+// <- END POP -> 
+@R13
+A=M
+M=D
+// <- END THAT PUSH/POP -> 
+
+// <- BEGIN ARG PUSH/POP -> 
+@0
+D=A
+@ARG
+D=D+M
+@R13
+M=D
+@R13
+A=M
+D=M
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+// <- END ARG PUSH/POP -> 
+
+// <- BEGIN CONSTANT PUSH/POP -> 
+@2
+D=A
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+// <- END CONSTANT PUSH/POP -> 
 
 // <- BEGIN SUBTRACT -> 
 // <- BEGIN POP -> 
@@ -309,29 +141,32 @@ M=M+1
 // <- END PUSH -> 
 // <- END SUBTRACT -> 
 
-// <- BEGIN THIS PUSH/POP -> 
-@6
+// <- BEGIN ARG PUSH/POP -> 
+@0
 D=A
-@THIS
+@ARG
 D=D+M
 @R13
 M=D
-@R13
+// <- BEGIN POP -> 
+@SP
+M=M-1
 A=M
 D=M
-// <- BEGIN PUSH -> 
-@SP
+// <- END POP -> 
+@R13
 A=M
 M=D
-@SP
-M=M+1
-// <- END PUSH -> 
-// <- END THIS PUSH/POP -> 
+// <- END ARG PUSH/POP -> 
 
-// <- BEGIN THIS PUSH/POP -> 
-@6
+// <- BEGIN LABEL ->
+(LOOP)
+// <- END LABEL ->
+
+// <- BEGIN ARG PUSH/POP -> 
+@0
 D=A
-@THIS
+@ARG
 D=D+M
 @R13
 M=D
@@ -345,7 +180,65 @@ M=D
 @SP
 M=M+1
 // <- END PUSH -> 
-// <- END THIS PUSH/POP -> 
+// <- END ARG PUSH/POP -> 
+
+// <- BEGIN GOTO ->
+// <- BEGIN POP -> 
+@SP
+M=M-1
+A=M
+D=M
+// <- END POP -> 
+@COMPUTE_ELEMENT
+D;JNE
+// <- END GOTO ->
+
+// <- BEGIN GOTO ->
+@END
+0;JMP
+// <- END GOTO ->
+
+// <- BEGIN LABEL ->
+(COMPUTE_ELEMENT)
+// <- END LABEL ->
+
+// <- BEGIN THAT PUSH/POP -> 
+@0
+D=A
+@THAT
+D=D+M
+@R13
+M=D
+@R13
+A=M
+D=M
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+// <- END THAT PUSH/POP -> 
+
+// <- BEGIN THAT PUSH/POP -> 
+@1
+D=A
+@THAT
+D=D+M
+@R13
+M=D
+@R13
+A=M
+D=M
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+// <- END THAT PUSH/POP -> 
 
 // <- BEGIN ADD -> 
 // <- BEGIN POP -> 
@@ -368,6 +261,112 @@ M=D
 M=M+1
 // <- END PUSH -> 
 // <- END ADD -> 
+
+// <- BEGIN THAT PUSH/POP -> 
+@2
+D=A
+@THAT
+D=D+M
+@R13
+M=D
+// <- BEGIN POP -> 
+@SP
+M=M-1
+A=M
+D=M
+// <- END POP -> 
+@R13
+A=M
+M=D
+// <- END THAT PUSH/POP -> 
+
+// <- POINTER PUSH/POP BEGIN -> 
+@THAT
+D=M
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+// <- POINTER PUSH/POP END -> 
+
+// <- BEGIN CONSTANT PUSH/POP -> 
+@1
+D=A
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+// <- END CONSTANT PUSH/POP -> 
+
+// <- BEGIN ADD -> 
+// <- BEGIN POP -> 
+@SP
+M=M-1
+A=M
+D=M
+// <- END POP -> 
+// <- BEGIN POP -> 
+@SP
+M=M-1
+A=M
+D=D+M
+// <- END POP -> 
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+// <- END ADD -> 
+
+// <- POINTER PUSH/POP BEGIN -> 
+// <- BEGIN POP -> 
+@SP
+M=M-1
+A=M
+D=M
+// <- END POP -> 
+@THAT
+M=D
+// <- POINTER PUSH/POP END -> 
+
+// <- BEGIN ARG PUSH/POP -> 
+@0
+D=A
+@ARG
+D=D+M
+@R13
+M=D
+@R13
+A=M
+D=M
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+// <- END ARG PUSH/POP -> 
+
+// <- BEGIN CONSTANT PUSH/POP -> 
+@1
+D=A
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+// <- END CONSTANT PUSH/POP -> 
 
 // <- BEGIN SUBTRACT -> 
 // <- BEGIN POP -> 
@@ -391,46 +390,32 @@ M=M+1
 // <- END PUSH -> 
 // <- END SUBTRACT -> 
 
-// <- BEGIN TEMP PUSH/POP -> 
-@5
+// <- BEGIN ARG PUSH/POP -> 
+@0
 D=A
-@6
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-// <- BEGIN PUSH -> 
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// <- END PUSH -> 
-// <- END TEMP PUSH/POP -> 
-
-// <- BEGIN ADD -> 
-// <- BEGIN POP -> 
-@SP
-M=M-1
-A=M
-D=M
-// <- END POP -> 
-// <- BEGIN POP -> 
-@SP
-M=M-1
-A=M
+@ARG
 D=D+M
-// <- END POP -> 
-// <- BEGIN PUSH -> 
+@R13
+M=D
+// <- BEGIN POP -> 
 @SP
+M=M-1
+A=M
+D=M
+// <- END POP -> 
+@R13
 A=M
 M=D
-@SP
-M=M+1
-// <- END PUSH -> 
-// <- END ADD -> 
+// <- END ARG PUSH/POP -> 
+
+// <- BEGIN GOTO ->
+@LOOP
+0;JMP
+// <- END GOTO ->
+
+// <- BEGIN LABEL ->
+(END)
+// <- END LABEL ->
 
 // <- BEGIN END PROGRAM -> 
 (END_0)

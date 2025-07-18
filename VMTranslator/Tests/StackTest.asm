@@ -729,8 +729,8 @@ M=M+1
 // <- END NOT -> 
 
 // <- BEGIN END PROGRAM -> 
-(END)
-@END
+(END_9)
+@END_9
 0;JMP
 // <- END END PROGRAM -> 
 

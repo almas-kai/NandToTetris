@@ -30,6 +30,7 @@ class Program
                     parser.Advance();
                     while (parser.HasMoreLines())
                     {
+                        string asmCode = "";
                         CommandType commandType = parser.CurrentCommandType;
                         if (commandType is not CommandType.C_RETURN)
                         {
@@ -41,8 +42,7 @@ class Program
                                 {
                                     if (int.TryParse(arg2, out int index))
                                     {
-                                        string asmCode = codeWriter.WritePushPop(commandType, arg1, index, inputFile.Name.Replace(".vm", ""));
-                                        streamWriter.WriteLine(asmCode);
+                                        asmCode = codeWriter.WritePushPop(commandType, arg1, index, inputFile.Name.Replace(".vm", ""));
                                     }
                                     else
                                     {
@@ -52,10 +52,22 @@ class Program
                             }
                             else if (commandType is CommandType.C_ARITHMETIC)
                             {
-                                string asmCode = codeWriter.WriteArithmetic(arg1);
-                                streamWriter.WriteLine(asmCode);
+                                asmCode = codeWriter.WriteArithmetic(arg1);
+                            }
+                            else if (commandType is CommandType.C_LABEL)
+                            {
+                                asmCode = codeWriter.writeLabel(arg1);
+                            }
+                            else if (commandType is CommandType.C_GOTO)
+                            {
+                                asmCode = codeWriter.writeGoto(arg1);
+                            }
+                            else if (commandType is CommandType.C_IF)
+                            {
+                                asmCode = codeWriter.writeIf(arg1);
                             }
                         }
+                        streamWriter.WriteLine(asmCode);
                         parser.Advance();
                     }
                     streamWriter.WriteLine(codeWriter.EndProgram());

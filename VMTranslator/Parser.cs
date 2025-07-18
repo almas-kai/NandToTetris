@@ -26,7 +26,12 @@ public class Parser
 			_instructions = streamReader.ReadToEnd()
 				.Split("\n")
 				.Where(instruction => Regex.IsMatch(instruction, @"^\s*(//.*)?$") is false)
-				.Select(instruction => Regex.Replace(instruction, @"\s", ""))
+				.Select(instruction =>
+				{
+					instruction = Regex.Replace(instruction, @"\s", "");
+					instruction = Regex.Replace(instruction, @"//.*", "");
+					return instruction;
+				})
 				.ToArray();
 		}
 	}
@@ -52,6 +57,18 @@ public class Parser
 			{
 				CurrentCommandType = CommandType.C_ARITHMETIC;
 			}
+			else if (command.StartsWith("label"))
+			{
+				CurrentCommandType = CommandType.C_LABEL;
+			}
+			else if (command.StartsWith("goto"))
+			{
+				CurrentCommandType = CommandType.C_GOTO;
+			}
+			else if (command.StartsWith("if-goto"))
+			{
+				CurrentCommandType = CommandType.C_IF;
+			}
 		}
 	}
 	public string GetArg1()
@@ -65,12 +82,33 @@ public class Parser
 			case CommandType.C_ARITHMETIC:
 				return _instructions[_pointer];
 			case CommandType.C_POP or CommandType.C_PUSH:
-				string command = _instructions[_pointer];
-				if (TryExtractSegment(command, out string segment))
+				string p_command = _instructions[_pointer];
+				if (TryExtractSegment(p_command, out string segment))
 				{
 					return segment;
 				}
-				throw new InvalidOperationException($"Parser error. Cannot extract the segment part of the instruction. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
+				throw new InvalidOperationException($"Parser error. Cannot extract the segment part of the push/pop instruction. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
+			case CommandType.C_LABEL:
+				string l_command = _instructions[_pointer];
+				if (TryExtractLabel(l_command, out string c_label))
+				{
+					return c_label;
+				}
+				throw new InvalidOperationException($"Parser error. Cannot extract the label part of the label instruction. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
+			case CommandType.C_GOTO:
+				string g_command = _instructions[_pointer];
+				if (TryExtractLabel(g_command, out string g_label))
+				{
+					return g_label;
+				}
+				throw new InvalidOperationException($"Parser error. Cannot extract the label part of the goto instruction. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
+			case CommandType.C_IF:
+				string if_command = _instructions[_pointer];
+				if (TryExtractLabel(if_command, out string if_label))
+				{
+					return if_label;
+				}
+				throw new InvalidOperationException($"Parser error. Cannot extract the label part of the if-goto instruction. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
 			default:
 				throw new InvalidOperationException($"Parser error. Cannot extract the arg1. Because of the unknown command type: {CurrentCommandType}. The instruction number is {_pointer}. The instruction is {_instructions[_pointer]}.");
 		}
@@ -119,6 +157,32 @@ public class Parser
 				result = value > -1;
 				index = value;
 			}
+		}
+		return result;
+	}
+	private bool TryExtractLabel(string fullCommand, out string label)
+	{
+		int offset = 0;
+		bool result = false;
+		label = "";
+		switch (CurrentCommandType)
+		{
+			case CommandType.C_LABEL:
+				offset = 5;
+				break;
+			case CommandType.C_GOTO:
+				offset = 4;
+				break;
+			case CommandType.C_IF:
+				offset = 7;
+				break;
+			default:
+				throw new InvalidOperationException($"Parser error. Extracting the label on the {CurrentCommandType} is forbidden. The instruction number is: {_pointer}. The instruction is {_instructions[_pointer]}.");
+		}
+		label = fullCommand.Substring(offset);
+		if (Regex.IsMatch(label, @"^[a-zA-Z._:][a-zA-Z0-9._:]*$"))
+		{
+			result = true;
 		}
 		return result;
 	}
