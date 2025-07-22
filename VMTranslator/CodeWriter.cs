@@ -287,6 +287,21 @@ public class CodeWriter
 
 		return asmCode;
 	}
+	public string writeBootstrappingCode()
+	{
+		string asmCode = "// <- BEGIN BOOTSTRAPPING CODE ->\n";
+
+		asmCode += "@256\n";
+		asmCode += "D=A\n";
+		asmCode += "@SP\n";
+		asmCode += "M=D\n";
+
+		asmCode += writeCall("Sys.init", 0);
+
+		asmCode += "// <- END BOOTSTRAPPING CODE ->\n";
+
+		return asmCode;
+	}
 	private string SegmentPopPush(string segment, int index, CommandType commandType)
 	{
 		string command = commandType.ToString().Substring(2).ToLower();

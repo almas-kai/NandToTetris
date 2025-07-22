@@ -23,14 +23,18 @@ class Program
                 outputFileName = potentialPath.Replace(".vm", ".asm");
                 filesToTranslate.Add(potentialPath);
             }
-            if(filesToTranslate.Count == 0)
+            if (filesToTranslate.Count == 0)
             {
                 Console.WriteLine("Enter a directory or a \".vm\" file. The directory must contain at least one \".vm\" file.");
                 return;
             }
             CodeWriter codeWriter = new CodeWriter();
+            string asmCode = "";
             using (StreamWriter streamWriter = new StreamWriter(outputFileName))
             {
+                // Remove bootstrapping code for tests that set it automatically, because they might set the values to different that the default ones. This code is needed for complex function tests.
+                asmCode = codeWriter.writeBootstrappingCode();
+                streamWriter.WriteLine(asmCode);
                 foreach (string path in filesToTranslate)
                 {
                     FileInfo inputFile = new FileInfo(path);
@@ -38,7 +42,6 @@ class Program
                     parser.Advance();
                     while (parser.HasMoreLines())
                     {
-                        string asmCode = "";
                         CommandType commandType = parser.CurrentCommandType;
                         if (commandType is not CommandType.C_RETURN)
                         {
