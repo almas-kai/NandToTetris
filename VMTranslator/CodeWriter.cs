@@ -161,7 +161,130 @@ public class CodeWriter
 		asmCode += "D;JNE\n";
 
 		asmCode += "// <- END GOTO ->\n";
-		
+
+		return asmCode;
+	}
+	public string writeFunction(string functionName, int nVars)
+	{
+		string asmCode = "// <- BEGIN FUNCTION ->\n";
+
+		asmCode += $"({functionName})\n";
+
+		for (int i = 0; i < nVars; i++)
+		{
+			asmCode += "@0\n";
+			asmCode += "D=A\n";
+			asmCode += Push();
+		}
+
+		asmCode += "// <- END FUNCTION ->\n";
+
+		return asmCode;
+	}
+	public string writeCall(string functionName, int nArgs)
+	{
+		string asmCode = "// <- BEGIN CALL ->\n";
+
+		asmCode += $"@return{functionName + _labelID}\n";
+		asmCode += "D=A\n";
+		asmCode += Push();
+
+		asmCode += "@LCL\n";
+		asmCode += "D=M\n";
+		asmCode += Push();
+
+		asmCode += "@ARG\n";
+		asmCode += "D=M\n";
+		asmCode += Push();
+
+		asmCode += "@THIS\n";
+		asmCode += "D=M\n";
+		asmCode += Push();
+
+		asmCode += "@THAT\n";
+		asmCode += "D=M\n";
+		asmCode += Push();
+
+		asmCode += "@SP\n";
+		asmCode += "D=M\n";
+		asmCode += $"@{nArgs + 5}\n";
+		asmCode += "D=D-A\n";
+		asmCode += "@ARG\n";
+		asmCode += "M=D\n";
+
+		asmCode += "@SP\n";
+		asmCode += "D=M\n";
+		asmCode += "@LCL\n";
+		asmCode += "M=D\n";
+
+		asmCode += $"@{functionName}\n";
+		asmCode += "0;JMP\n";
+		asmCode += $"(return{functionName + _labelID})\n";
+
+		asmCode += "// <- END CALL ->\n";
+
+		_labelID++;
+
+		return asmCode;
+	}
+	public string writeReturn()
+	{
+		string asmCode = "// <- BEGIN RETURN ->\n";
+
+		asmCode += "@LCL\n";
+		asmCode += "D=M\n";
+		asmCode += "@R13\n";
+		asmCode += "M=D\n";
+
+		asmCode += "@5\n";
+		asmCode += "D=A\n";
+		asmCode += "@R13\n";
+		asmCode += "D=M-D\n";
+		asmCode += "@R14\n";
+		asmCode += "M=D\n";
+
+		asmCode += Pop();
+		asmCode += "@ARG\n";
+		asmCode += "A=M\n";
+		asmCode += "M=D\n";
+
+		asmCode += "@ARG\n";
+		asmCode += "D=M\n";
+		asmCode += "@1\n";
+		asmCode += "D=D+A\n";
+		asmCode += "@SP\n";
+		asmCode += "M=D\n";
+
+		asmCode += "@R13\n";
+		asmCode += "AM=M-1\n";
+		asmCode += "D=M\n";
+		asmCode += "@THAT\n";
+		asmCode += "M=D\n";
+
+		asmCode += "@R13\n";
+		asmCode += "AM=M-1\n";
+		asmCode += "D=M\n";
+		asmCode += "@THIS\n";
+		asmCode += "M=D\n";
+
+		asmCode += "@R13\n";
+		asmCode += "AM=M-1\n";
+		asmCode += "D=M\n";
+		asmCode += "@ARG\n";
+		asmCode += "M=D\n";
+
+		asmCode += "@R13\n";
+		asmCode += "AM=M-1\n";
+		asmCode += "D=M\n";
+		asmCode += "@LCL\n";
+		asmCode += "M=D\n";
+
+		asmCode += "@R14\n";
+		asmCode += "A=M\n";
+		asmCode += "0;JMP\n";
+
+		asmCode += "// <- END RETURN ->\n";
+
 		return asmCode;
 	}
 	private string SegmentPopPush(string segment, int index, CommandType commandType)

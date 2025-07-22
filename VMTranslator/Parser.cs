@@ -19,8 +19,10 @@ public class Parser
 	private string[] _instructions;
 	private int _pointer = -1;
 	public CommandType CurrentCommandType;
+	public string FileName { get; private set; }
 	public Parser(FileInfo file)
 	{
+		FileName = file.Name.Replace(".vm", "");
 		using (StreamReader streamReader = file.OpenText())
 		{
 			_instructions = streamReader.ReadToEnd()
@@ -28,8 +30,15 @@ public class Parser
 				.Where(instruction => Regex.IsMatch(instruction, @"^\s*(//.*)?$") is false)
 				.Select(instruction =>
 				{
-					instruction = Regex.Replace(instruction, @"\s", "");
 					instruction = Regex.Replace(instruction, @"//.*", "");
+					if (Regex.IsMatch(instruction, @"^\s*(function|call)\b"))
+					{
+						instruction = instruction.Trim();
+					}
+					else
+					{
+						instruction = Regex.Replace(instruction, @"\s", "");
+					}
 					return instruction;
 				})
 				.ToArray();
@@ -68,6 +77,22 @@ public class Parser
 			else if (command.StartsWith("if-goto"))
 			{
 				CurrentCommandType = CommandType.C_IF;
+			}
+			else if (command.StartsWith("function"))
+			{
+				CurrentCommandType = CommandType.C_FUNCTION;
+			}
+			else if (command == "return")
+			{
+				CurrentCommandType = CommandType.C_RETURN;
+			}
+			else if (command.StartsWith("call"))
+			{
+				CurrentCommandType = CommandType.C_CALL;
+			}
+			else
+			{
+				throw new InvalidOperationException($"Parser error. Unrecognized command type: \"{command}\". The instruction number is {_pointer}. The instruction is {_instructions[_pointer]}.");
 			}
 		}
 	}
@@ -109,6 +134,13 @@ public class Parser
 					return if_label;
 				}
 				throw new InvalidOperationException($"Parser error. Cannot extract the label part of the if-goto instruction. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
+			case CommandType.C_FUNCTION or CommandType.C_CALL:
+				string func_command = _instructions[_pointer];
+				if (TryExtractFunctionName(func_command, out string funcName))
+				{
+					return FileName + "." + funcName;
+				}
+				throw new InvalidOperationException($"Parser error. Cannot extract the function name part of the function or call instruction. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
 			default:
 				throw new InvalidOperationException($"Parser error. Cannot extract the arg1. Because of the unknown command type: {CurrentCommandType}. The instruction number is {_pointer}. The instruction is {_instructions[_pointer]}.");
 		}
@@ -122,12 +154,19 @@ public class Parser
 		switch (CurrentCommandType)
 		{
 			case CommandType.C_PUSH or CommandType.C_POP:
-				string command = _instructions[_pointer];
-				if (TryExtractSegmentIndex(command, out int index))
+				string p_command = _instructions[_pointer];
+				if (TryExtractSegmentIndex(p_command, out int index))
 				{
 					return index.ToString();
 				}
 				throw new InvalidOperationException($"Parser error. Cannot extract the index. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
+			case CommandType.C_FUNCTION or CommandType.C_CALL:
+				string f_command = _instructions[_pointer];
+				if (TryExtractFunctionArgOrVar(f_command, out int argOrVar))
+				{
+					return argOrVar.ToString();
+				}
+				throw new InvalidOperationException($"Parser error. Cannot extract the number part of the function or call instruction. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
 			default:
 				throw new InvalidOperationException($"Parser error. Cannot extract the arg2. Because of the unknown command type: {CurrentCommandType}. The instruction number is {_pointer}. The instruction is {_instructions[_pointer]}.");
 		}
@@ -160,6 +199,7 @@ public class Parser
 		}
 		return result;
 	}
+
 	private bool TryExtractLabel(string fullCommand, out string label)
 	{
 		int offset = 0;
@@ -184,6 +224,37 @@ public class Parser
 		{
 			result = true;
 		}
+		return result;
+	}
+	private bool TryExtractFunctionName(string wholeCommand, out string functionName)
+	{
+		bool result = false;
+		functionName = "";
+
+		Match match = Regex.Match(wholeCommand, @"^(function|call)\s+([^\s]+)\s+\d+$");
+
+		if (match.Success)
+		{
+			result = true;
+			functionName = match.Groups[1].Value;
+		}
+
+		return result;
+	}
+
+	private bool TryExtractFunctionArgOrVar(string wholeCommand, out int argOrVar)
+	{
+		bool result = false;
+		argOrVar = 0;
+
+		Match match = Regex.Match(wholeCommand, @"^(function|call)\s+[^\s]+\s+(\d+)$");
+
+		if (match.Success && int.TryParse(match.Groups[2].Value, out int value))
+		{
+			result = true;
+			argOrVar = value;
+		}
+
 		return result;
 	}
 }

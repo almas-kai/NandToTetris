@@ -10,23 +10,31 @@ class Program
         }
         else
         {
-            string path = args[0].Trim();
-            if (path.EndsWith(".vm") is false)
+            string potentialPath = args[0].Trim();
+            string outputFileName = "";
+            List<string> filesToTranslate = new List<string>();
+            if (Directory.Exists(potentialPath))
             {
-                Console.WriteLine("The file has to have the \".vm\" extension.");
+                outputFileName = potentialPath + (potentialPath.EndsWith("/") ? "" : "/") + "source.asm";
+                filesToTranslate.AddRange(Directory.GetFiles(potentialPath).Where(f => f.EndsWith(".vm")));
             }
-            else if (File.Exists(path) is false)
+            else if (potentialPath.EndsWith(".vm") && File.Exists(potentialPath))
             {
-                Console.WriteLine("The file doesn't exist. Or you don't have the permission to read the file.");
+                outputFileName = potentialPath.Replace(".vm", ".asm");
+                filesToTranslate.Add(potentialPath);
             }
-            else
+            if(filesToTranslate.Count == 0)
             {
-                FileInfo inputFile = new FileInfo(path);
-                string outputFile = inputFile.FullName.Replace(".vm", ".asm");
-                Parser parser = new Parser(inputFile);
-                CodeWriter codeWriter = new CodeWriter();
-                using (StreamWriter streamWriter = new StreamWriter(outputFile))
+                Console.WriteLine("Enter a directory or a \".vm\" file. The directory must contain at least one \".vm\" file.");
+                return;
+            }
+            CodeWriter codeWriter = new CodeWriter();
+            using (StreamWriter streamWriter = new StreamWriter(outputFileName))
+            {
+                foreach (string path in filesToTranslate)
                 {
+                    FileInfo inputFile = new FileInfo(path);
+                    Parser parser = new Parser(inputFile);
                     parser.Advance();
                     while (parser.HasMoreLines())
                     {
@@ -49,6 +57,22 @@ class Program
                                         throw new InvalidOperationException($"Translator error. The index is not and integer: {arg2}.");
                                     }
                                 }
+                                else
+                                {
+                                    int varOrArg = int.Parse(arg2);
+                                    if (commandType is CommandType.C_FUNCTION)
+                                    {
+                                        asmCode = codeWriter.writeFunction(arg1, varOrArg);
+                                    }
+                                    else if (commandType is CommandType.C_CALL)
+                                    {
+                                        asmCode = codeWriter.writeCall(arg1, varOrArg);
+                                    }
+                                    else
+                                    {
+                                        throw new InvalidOperationException($"Translator error. The command type is not a function or call: {commandType}.");
+                                    }
+                                }
                             }
                             else if (commandType is CommandType.C_ARITHMETIC)
                             {
@@ -66,6 +90,14 @@ class Program
                             {
                                 asmCode = codeWriter.writeIf(arg1);
                             }
+                        }
+                        else if (commandType is CommandType.C_RETURN)
+                        {
+                            asmCode = codeWriter.writeReturn();
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException($"Translator error. Unrecognized command type: {commandType}.");
                         }
                         streamWriter.WriteLine(asmCode);
                         parser.Advance();
