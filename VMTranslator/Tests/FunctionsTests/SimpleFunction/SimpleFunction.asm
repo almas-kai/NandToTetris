@@ -1,5 +1,72 @@
+// <- BEGIN BOOTSTRAPPING CODE ->
+@256
+D=A
+@SP
+M=D
+// <- BEGIN CALL ->
+@returnSys.init0
+D=A
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+@LCL
+D=M
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+@ARG
+D=M
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+@THIS
+D=M
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+@THAT
+D=M
+// <- BEGIN PUSH -> 
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// <- END PUSH -> 
+@SP
+D=M
+@5
+D=D-A
+@ARG
+M=D
+@SP
+D=M
+@LCL
+M=D
+@Sys.init
+0;JMP
+(returnSys.init0)
+// <- END CALL ->
+// <- END BOOTSTRAPPING CODE ->
+
 // <- BEGIN FUNCTION ->
-(SimpleFunction.function)
+(SimpleFunction.test)
 @0
 D=A
 // <- BEGIN PUSH -> 
@@ -230,8 +297,8 @@ A=M
 // <- END RETURN ->
 
 // <- BEGIN END PROGRAM -> 
-(END_0)
-@END_0
+(END_1)
+@END_1
 0;JMP
 // <- END END PROGRAM -> 
 

@@ -19,10 +19,8 @@ public class Parser
 	private string[] _instructions;
 	private int _pointer = -1;
 	public CommandType CurrentCommandType;
-	public string FileName { get; private set; }
 	public Parser(FileInfo file)
 	{
-		FileName = file.Name.Replace(".vm", "");
 		using (StreamReader streamReader = file.OpenText())
 		{
 			_instructions = streamReader.ReadToEnd()
@@ -138,7 +136,7 @@ public class Parser
 				string func_command = _instructions[_pointer];
 				if (TryExtractFunctionName(func_command, out string funcName))
 				{
-					return FileName + "." + funcName;
+					return funcName;
 				}
 				throw new InvalidOperationException($"Parser error. Cannot extract the function name part of the function or call instruction. The current instruction number is {_pointer}. The current instruction is {_instructions[_pointer]}.");
 			default:
@@ -236,7 +234,7 @@ public class Parser
 		if (match.Success)
 		{
 			result = true;
-			functionName = match.Groups[1].Value;
+			functionName = match.Groups[2].Value;
 		}
 
 		return result;

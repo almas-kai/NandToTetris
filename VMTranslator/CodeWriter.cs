@@ -281,6 +281,7 @@ public class CodeWriter
 
 		asmCode += "@R14\n";
 		asmCode += "A=M\n";
+		asmCode += "A=M\n";
 		asmCode += "0;JMP\n";
 
 		asmCode += "// <- END RETURN ->\n";
