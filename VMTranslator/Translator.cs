@@ -32,7 +32,7 @@ class Program
             string asmCode = "";
             using (StreamWriter streamWriter = new StreamWriter(outputFileName))
             {
-                // Remove bootstrapping code for tests that set it automatically, because they might set the values to different that the default ones. This code is needed for complex function tests.
+                // Remove bootstrapping code for tests that set it automatically, because they might set the values to different that the default ones. This code is needed for FibonacciElement tests and for StaticsTests. For other types of tests it will break them I believe, though i am not sure.
                 asmCode = codeWriter.writeBootstrappingCode();
                 streamWriter.WriteLine(asmCode);
                 foreach (string path in filesToTranslate)

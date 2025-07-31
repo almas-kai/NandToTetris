@@ -184,7 +184,8 @@ M=D
 @5
 D=A
 @R13
-D=M-D
+A=M-D
+D=M
 @R14
 M=D
 // <- BEGIN POP -> 
@@ -223,7 +224,6 @@ D=M
 @LCL
 M=D
 @R14
-A=M
 A=M
 0;JMP
 // <- END RETURN ->
@@ -490,7 +490,8 @@ M=D
 @5
 D=A
 @R13
-D=M-D
+A=M-D
+D=M
 @R14
 M=D
 // <- BEGIN POP -> 
@@ -529,7 +530,6 @@ D=M
 @LCL
 M=D
 @R14
-A=M
 A=M
 0;JMP
 // <- END RETURN ->

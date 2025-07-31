@@ -239,7 +239,8 @@ public class CodeWriter
 		asmCode += "@5\n";
 		asmCode += "D=A\n";
 		asmCode += "@R13\n";
-		asmCode += "D=M-D\n";
+		asmCode += "A=M-D\n";
+		asmCode += "D=M\n";
 		asmCode += "@R14\n";
 		asmCode += "M=D\n";
 
@@ -280,7 +281,6 @@ public class CodeWriter
 		asmCode += "M=D\n";
 
 		asmCode += "@R14\n";
-		asmCode += "A=M\n";
 		asmCode += "A=M\n";
 		asmCode += "0;JMP\n";
 
