@@ -11,12 +11,39 @@ public enum TokenType
 	STRING_CONST
 }
 
+public enum Keyword
+{
+	CLASS,
+	METHOD,
+	FUNCTION,
+	CONSTRUCTOR,
+	INT,
+	BOOLEAN,
+	CHAR,
+	VOID,
+	VAR,
+	STATIC,
+	FIELD,
+	LET,
+	DO,
+	IF,
+	ELSE,
+	WHILE,
+	RETURN,
+	TRUE,
+	FALSE,
+	NULL,
+	THIS
+}
+
 class JackTokenizer
 {
 	private string[] _instructions;
 	private int _pointer = 0;
 	private int _offset = 0;
 	private string _currentInstruction = String.Empty;
+	private string _currentTokenValue = String.Empty;
+	private TokenType _currentTokenType;
 	public JackTokenizer(FileInfo fileInfo)
 	{
 		string patternForComments = @"//.*|/\*[\s\S]*?\*/";
@@ -38,10 +65,10 @@ class JackTokenizer
 	{
 		if (HasMoreTokens is false)
 		{
-			throw new InvalidOperationException($"Tokenizer error - Advance method error. Cannot advance. There are no more instructions. Current instruction number: {_pointer}. Current instruction: {_instructions[_pointer]}.");
+			throw new InvalidOperationException($"Tokenizer error - Advance method error. Cannot advance. There are no more instructions. Current instruction number: \"{_pointer}\". Current instruction: \"{_instructions[_pointer]}\".");
 		}
 
-		SpaceToken:
+	SpaceToken:
 		if (_offset == _currentInstruction.Length)
 		{
 			_Next();
@@ -59,13 +86,79 @@ class JackTokenizer
 			}
 			else
 			{
-				throw new InvalidOperationException($"Tokenizer error - Advance method error. Couldn't match the token. Unrecognized token type. Current instruction number: {_pointer}. Current instruction: {_instructions[_pointer]}.");
+				throw new InvalidOperationException($"Tokenizer error - Advance method error. Couldn't match the token. Unrecognized token type. Current instruction number: \"{_pointer}\". Current instruction: \"{_instructions[_pointer]}\".");
 			}
 		}
 	}
 	public TokenType GetTokenType()
 	{
-		throw new NotImplementedException();
+		return _currentTokenType;
+	}
+	public Keyword GetKeyword()
+	{
+		if (_currentTokenType is not TokenType.KEYWORD)
+		{
+			throw new InvalidOperationException($"Tokenizer error. Cannot get the keyword. Because token type is not keyword. It is: \"{_currentTokenType}\".");
+		}
+
+		if (Enum.TryParse<Keyword>(_currentTokenValue, ignoreCase: true, out Keyword keyword))
+		{
+			return keyword;
+		}
+		else
+		{
+			throw new InvalidOperationException($"Tokenizer error. Cannot get the keyword. There is no such keyword as \"{_currentTokenValue}\".");
+		}
+	}
+	public char GetSymbol()
+	{
+		if (_currentTokenType is not TokenType.SYMBOL)
+		{
+			throw new InvalidOperationException($"Tokenizer error. Cannot get the symbol. Because token type is not symbol. It is: \"{_currentTokenType}\".");
+		}
+
+		if (_currentTokenValue.Length == 1)
+		{
+			return _currentTokenValue[0];
+		}
+		else
+		{
+			throw new InvalidOperationException($"Tokenizer error. Cannot get the symbol. Because token value is string: \"{_currentTokenValue}\".");
+		}
+	}
+	public string GetIdentifier()
+	{
+		if (_currentTokenType is not TokenType.IDENTIFIER)
+		{
+			throw new InvalidOperationException($"Tokenizer error. Cannot get the identifier. Because token type is not identifier. It is: \"{_currentTokenType}\".");
+		}
+
+		return _currentTokenValue;
+	}
+	public int GetInteger()
+	{
+		if (_currentTokenType is not TokenType.INT_CONST)
+		{
+			throw new InvalidOperationException($"Tokenizer error. Cannot get the integer constant. Because token type is not integer constant. It is: \"{_currentTokenType}\".");
+		}
+
+		if (int.TryParse(_currentTokenValue, out int intConst))
+		{
+			return intConst;
+		}
+		else
+		{
+			throw new InvalidOperationException($"Tokenizer error. Cannot get the integer constant. Because it is not an integer constant. It is: \"{_currentTokenValue}\".");
+		}
+	}
+	public string GetString()
+	{
+		if (_currentTokenType is not TokenType.STRING_CONST)
+		{
+			throw new InvalidOperationException($"Tokenizer error. Cannot get the string constant. Because token type is not string constant. It is: \"{_currentTokenType}\".");
+		}
+
+		return _currentTokenValue;
 	}
 	private void _Next()
 	{
@@ -92,12 +185,35 @@ class JackTokenizer
 			_IsIdentifier
 		};
 
-		foreach (Func<Match> matcher in matchers)
+		for (int i = 0; i < matchers.Length; i++)
 		{
+			Func<Match> matcher = matchers[i];
 			Match tempMatch = matcher.Invoke();
 			if (tempMatch.Success && tempMatch.Index == _offset)
 			{
 				match = tempMatch;
+				_currentTokenValue = tempMatch.Value;
+				switch (i)
+				{
+					case 0:
+						_currentTokenType = TokenType.KEYWORD;
+						break;
+					case 1:
+						_currentTokenType = TokenType.SYMBOL;
+						break;
+					case 2:
+						_currentTokenType = TokenType.INT_CONST;
+						break;
+					case 3:
+						_currentTokenType = TokenType.STRING_CONST;
+						_currentTokenValue = _currentTokenValue.Trim('"');
+						break;
+					case 4:
+						_currentTokenType = TokenType.IDENTIFIER;
+						break;
+					default:
+						throw new InvalidOperationException($"Tokenizer error. Error in _MatchToken. Unrecognized token type.");
+				}
 				break;
 			}
 		}
