@@ -38,6 +38,36 @@ class JackAnalyzer
                 while (jackTokenizer.HasMoreTokens)
                 {
                     jackTokenizer.Advance();
+
+                    if (!jackTokenizer.HasMoreTokens)
+                    {
+                        break;
+                    }
+
+                    TokenType tokenType = jackTokenizer.GetTokenType();
+                    switch (tokenType)
+                    {
+                        case TokenType.KEYWORD:
+                            Keyword keyword = jackTokenizer.GetKeyword();
+                            Console.WriteLine($"KEYWORD: {keyword}");
+                            break;
+                        case TokenType.SYMBOL:
+                            char symbol = jackTokenizer.GetSymbol();
+                            Console.WriteLine($"SYMBOL: {symbol}");
+                            break;
+                        case TokenType.IDENTIFIER:
+                            string identifier = jackTokenizer.GetIdentifier();
+                            Console.WriteLine($"IDENTIFIER: {identifier}");
+                            break;
+                        case TokenType.INT_CONST:
+                            int intConstant = jackTokenizer.GetInteger();
+                            Console.WriteLine($"INT_CONST: {intConstant}");
+                            break;
+                        case TokenType.STRING_CONST:
+                            string stringConstant = jackTokenizer.GetString();
+                            Console.WriteLine($"STRING_CONST: {stringConstant}");
+                            break;
+                    }
                 }
             }
         }

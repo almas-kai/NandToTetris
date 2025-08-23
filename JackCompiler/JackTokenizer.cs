@@ -73,7 +73,7 @@ class JackTokenizer
 		{
 			_Next();
 		}
-		else if (HasMoreTokens)
+		if (HasMoreTokens)
 		{
 			Match tokenMatch = _MatchToken();
 			if (tokenMatch.Success)
