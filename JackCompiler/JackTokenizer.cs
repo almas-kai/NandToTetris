@@ -44,12 +44,20 @@ class JackTokenizer
 	private string _currentInstruction = String.Empty;
 	private string _currentTokenValue = String.Empty;
 	private TokenType _currentTokenType;
+
+	private static readonly Regex _commentsRegex = new Regex(@"//.*|/\*[\s\S]*?\*/", RegexOptions.Compiled);
+	private static readonly Regex _keywordRegex = new Regex(@"\b(class|constructor|function|method|field|static|var|int|char|boolean|void|true|false|null|this|let|do|if|else|while|return)\b", RegexOptions.Compiled);
+	private static readonly Regex _symbolRegex = new Regex(@"[{}()\[\].,;+\-*/&|<>=~]", RegexOptions.Compiled);
+	private static readonly Regex _integerConstantRegex = new Regex(@"\b\d+\b", RegexOptions.Compiled);
+	private static readonly Regex _stringConstantRegex = new Regex(@"(""[^""]*"")", RegexOptions.Compiled);
+	private static readonly Regex _identifierRegex = new Regex(@"\b([_a-zA-Z]+[_a-zA-Z0-9]*)\b", RegexOptions.Compiled);
+	private static readonly Regex _spaceRegex = new Regex(@"\s", RegexOptions.Compiled);
+
 	public JackTokenizer(FileInfo fileInfo)
 	{
-		string patternForComments = @"//.*|/\*[\s\S]*?\*/";
 		using (StreamReader streamReader = fileInfo.OpenText())
 		{
-			_instructions = Regex.Replace(streamReader.ReadToEnd(), patternForComments, "")
+			_instructions = _commentsRegex.Replace(streamReader.ReadToEnd(), "")
 				.Split("\n")
 				.Select(instruction => instruction.Trim())
 				.Where(instruction => instruction != String.Empty)
@@ -144,7 +152,14 @@ class JackTokenizer
 
 		if (int.TryParse(_currentTokenValue, out int intConst))
 		{
-			return intConst;
+			if (intConst >= 0 && intConst <= 32767)
+			{
+				return intConst;
+			}
+			else
+			{
+				throw new InvalidOperationException($"Tokenizer error. Cannot get the integer constant. Because it has to be 0 <= x <= 32767. But it was: {intConst}.");
+			}
 		}
 		else
 		{
@@ -228,55 +243,32 @@ class JackTokenizer
 
 	private Match _IsKeyword()
 	{
-		string keywordPattern = @"\b(class|constructor|function|method|field|static|var|int|char|boolean|void|true|false|null|this|let|do|if|else|while|return)\b";
-
-		Regex keyword = new Regex(keywordPattern);
-
-		return keyword.Match(_currentInstruction, _offset);
+		return _keywordRegex.Match(_currentInstruction, _offset);
 	}
 
 	private Match _IsSymbol()
 	{
-		string symbolPattern = @"[{}()\[\].,;+\-*/&|<>=~]";
-
-		Regex symbol = new Regex(symbolPattern);
-
-		return symbol.Match(_currentInstruction, _offset);
+		return _symbolRegex.Match(_currentInstruction, _offset);
 	}
 
 	private Match _IsIntegerConstant()
 	{
-		string integerConstantPattern = @"\b\d+\b";
 
-		Regex integerConstant = new Regex(integerConstantPattern);
-
-		return integerConstant.Match(_currentInstruction, _offset);
+		return _integerConstantRegex.Match(_currentInstruction, _offset);
 	}
 
 	private Match _IsStringConstant()
 	{
-		string stringConstantPattern = @"(""[^""]*"")";
-
-		Regex stringConstant = new Regex(stringConstantPattern);
-
-		return stringConstant.Match(_currentInstruction, _offset);
+		return _stringConstantRegex.Match(_currentInstruction, _offset);
 	}
 
 	private Match _IsIdentifier()
 	{
-		string identifierPattern = @"\b([_a-zA-Z]+[_a-zA-Z0-9]*)\b";
-
-		Regex identifier = new Regex(identifierPattern);
-
-		return identifier.Match(_currentInstruction, _offset);
+		return _identifierRegex.Match(_currentInstruction, _offset);
 	}
 
 	private Match _IsSpace()
 	{
-		string spacePattern = @"\s";
-
-		Regex space = new Regex(spacePattern);
-
-		return space.Match(_currentInstruction, _offset);
+		return _spaceRegex.Match(_currentInstruction, _offset);
 	}
 }
