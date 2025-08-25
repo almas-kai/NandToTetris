@@ -14,16 +14,13 @@ class JackAnalyzer
         else
         {
             string potentialPath = args[0].Trim();
-            string outputPath = "";
             List<string> filesToCompile = new List<string>();
             if (Directory.Exists(potentialPath))
             {
-                outputPath = potentialPath;
                 filesToCompile.AddRange(Directory.GetFiles(potentialPath).Where(f => f.EndsWith(JACK_EXTENSION)));
             }
             else if (potentialPath.EndsWith(JACK_EXTENSION) && File.Exists(potentialPath))
             {
-                outputPath = string.Concat(potentialPath.Replace(JACK_EXTENSION, ""), TOKENIZED_OUTPUT, XML_EXTENSION);
                 filesToCompile.Add(potentialPath);
             }
             if (filesToCompile.Count == 0)
@@ -35,15 +32,16 @@ class JackAnalyzer
             {
                 FileInfo fileInfo = new FileInfo(fileName);
                 JackTokenizer jackTokenizer = new JackTokenizer(fileInfo);
+
+                string outputPath = fileName.Replace(JACK_EXTENSION, TOKENIZED_OUTPUT + XML_EXTENSION);
+
+                // Testing generation must be called before any Advance calls.
+                jackTokenizer.GenerateTestingXMLFile(outputPath);
+
+                jackTokenizer.Advance();
+                
                 while (jackTokenizer.HasMoreTokens)
                 {
-                    jackTokenizer.Advance();
-
-                    if (!jackTokenizer.HasMoreTokens)
-                    {
-                        break;
-                    }
-
                     TokenType tokenType = jackTokenizer.GetTokenType();
                     switch (tokenType)
                     {
@@ -63,6 +61,8 @@ class JackAnalyzer
                             string stringConstant = jackTokenizer.GetString();
                             break;
                     }
+
+                    jackTokenizer.Advance();
                 }
             }
         }

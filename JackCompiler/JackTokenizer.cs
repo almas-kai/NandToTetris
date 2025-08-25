@@ -175,6 +175,53 @@ class JackTokenizer
 
 		return _currentTokenValue;
 	}
+	public void GenerateTestingXMLFile(string fullPath)
+	{
+		if (_pointer != 0 || _offset != 0)
+		{
+			throw new InvalidOperationException($"Tokenizer error. Cannot generate testing XML file. The pointer and offset are not at the start. Pointer is {_pointer}, offset is {_offset}.");
+		}
+		using (StreamWriter writer = new StreamWriter(fullPath))
+		{
+			Advance();
+			writer.WriteLine("<tokens>");
+			while (HasMoreTokens)
+			{
+				TokenType tokenType = GetTokenType();
+				switch (tokenType)
+				{
+					case TokenType.KEYWORD:
+						Keyword keyword = GetKeyword();
+						writer.WriteLine($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						break;
+					case TokenType.SYMBOL:
+						char symbol = GetSymbol();
+						writer.WriteLine($"<symbol> {symbol} </symbol>");
+						break;
+					case TokenType.IDENTIFIER:
+						string identifier = GetIdentifier();
+						writer.WriteLine($"<identifier> {identifier} </identifier>");
+						break;
+					case TokenType.INT_CONST:
+						int intConstant = GetInteger();
+						writer.WriteLine($"<integerConstant> {intConstant} </integerConstant>");
+						break;
+					case TokenType.STRING_CONST:
+						string stringConstant = GetString();
+						writer.WriteLine($"<stringConstant> {stringConstant} </stringConstant>");
+						break;
+				}
+				Advance();
+			}
+			writer.WriteLine("</tokens>");
+		}
+		_pointer = 0;
+		_offset = 0;
+		if (_pointer < _instructions.Length)
+		{
+			HasMoreTokens = true;
+		}
+	}
 	private void _Next()
 	{
 		if (_pointer < _instructions.Length)
