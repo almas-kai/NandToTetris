@@ -118,7 +118,7 @@ class JackTokenizer
 			throw new InvalidOperationException($"Tokenizer error. Cannot get the keyword. There is no such keyword as \"{_currentTokenValue}\".");
 		}
 	}
-	public char GetSymbol()
+	public string GetSymbol()
 	{
 		if (_currentTokenType is not TokenType.SYMBOL)
 		{
@@ -127,7 +127,19 @@ class JackTokenizer
 
 		if (_currentTokenValue.Length == 1)
 		{
-			return _currentTokenValue[0];
+			switch (_currentTokenValue)
+			{
+				case "<":
+					return "&lt;";
+				case ">":
+					return "&gt;";
+				case "&":
+					return "&amp;";
+				case "\"":
+					return "&quot;";
+				default:
+					return _currentTokenValue;
+			}
 		}
 		else
 		{
@@ -195,7 +207,7 @@ class JackTokenizer
 						writer.WriteLine($"<keyword> {keyword.ToString().ToLower()} </keyword>");
 						break;
 					case TokenType.SYMBOL:
-						char symbol = GetSymbol();
+						string symbol = GetSymbol();
 						writer.WriteLine($"<symbol> {symbol} </symbol>");
 						break;
 					case TokenType.IDENTIFIER:

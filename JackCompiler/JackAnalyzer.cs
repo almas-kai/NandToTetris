@@ -33,10 +33,12 @@ class JackAnalyzer
                 FileInfo fileInfo = new FileInfo(fileName);
                 JackTokenizer jackTokenizer = new JackTokenizer(fileInfo);
 
-                string outputPath = fileName.Replace(JACK_EXTENSION, TOKENIZED_OUTPUT + XML_EXTENSION);
+                string outputPathForTestingXMLFile = fileName.Replace(JACK_EXTENSION, TOKENIZED_OUTPUT + XML_EXTENSION);
 
                 // Testing generation must be called before any Advance calls.
-                jackTokenizer.GenerateTestingXMLFile(outputPath);
+                jackTokenizer.GenerateTestingXMLFile(outputPathForTestingXMLFile);
+
+                string outputFileName = fileName.Replace(JACK_EXTENSION, XML_EXTENSION);
 
                 jackTokenizer.Advance();
                 
@@ -49,7 +51,7 @@ class JackAnalyzer
                             Keyword keyword = jackTokenizer.GetKeyword();
                             break;
                         case TokenType.SYMBOL:
-                            char symbol = jackTokenizer.GetSymbol();
+                            string symbol = jackTokenizer.GetSymbol();
                             break;
                         case TokenType.IDENTIFIER:
                             string identifier = jackTokenizer.GetIdentifier();
