@@ -42,30 +42,7 @@ class JackAnalyzer
 
                 jackTokenizer.Advance();
                 
-                while (jackTokenizer.HasMoreTokens)
-                {
-                    TokenType tokenType = jackTokenizer.GetTokenType();
-                    switch (tokenType)
-                    {
-                        case TokenType.KEYWORD:
-                            Keyword keyword = jackTokenizer.GetKeyword();
-                            break;
-                        case TokenType.SYMBOL:
-                            string symbol = jackTokenizer.GetSymbol();
-                            break;
-                        case TokenType.IDENTIFIER:
-                            string identifier = jackTokenizer.GetIdentifier();
-                            break;
-                        case TokenType.INT_CONST:
-                            int intConstant = jackTokenizer.GetInteger();
-                            break;
-                        case TokenType.STRING_CONST:
-                            string stringConstant = jackTokenizer.GetString();
-                            break;
-                    }
-
-                    jackTokenizer.Advance();
-                }
+                
             }
         }
     }
