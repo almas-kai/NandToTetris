@@ -2,40 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace JackCompiler;
 
-public enum TokenType
-{
-	KEYWORD,
-	SYMBOL,
-	IDENTIFIER,
-	INT_CONST,
-	STRING_CONST
-}
-
-public enum Keyword
-{
-	CLASS,
-	METHOD,
-	FUNCTION,
-	CONSTRUCTOR,
-	INT,
-	BOOLEAN,
-	CHAR,
-	VOID,
-	VAR,
-	STATIC,
-	FIELD,
-	LET,
-	DO,
-	IF,
-	ELSE,
-	WHILE,
-	RETURN,
-	TRUE,
-	FALSE,
-	NULL,
-	THIS
-}
-
 class JackTokenizer
 {
 	private string[] _instructions;
@@ -45,19 +11,12 @@ class JackTokenizer
 	private string _currentTokenValue = String.Empty;
 	private TokenType _currentTokenType;
 
-	private static readonly Regex _commentsRegex = new Regex(@"//.*|/\*[\s\S]*?\*/", RegexOptions.Compiled);
-	private static readonly Regex _keywordRegex = new Regex(@"\b(class|constructor|function|method|field|static|var|int|char|boolean|void|true|false|null|this|let|do|if|else|while|return)\b", RegexOptions.Compiled);
-	private static readonly Regex _symbolRegex = new Regex(@"[{}()\[\].,;+\-*/&|<>=~]", RegexOptions.Compiled);
-	private static readonly Regex _integerConstantRegex = new Regex(@"\b\d+\b", RegexOptions.Compiled);
-	private static readonly Regex _stringConstantRegex = new Regex(@"(""[^""]*"")", RegexOptions.Compiled);
-	private static readonly Regex _identifierRegex = new Regex(@"\b([_a-zA-Z]+[_a-zA-Z0-9]*)\b", RegexOptions.Compiled);
-	private static readonly Regex _spaceRegex = new Regex(@"\s", RegexOptions.Compiled);
-
 	public JackTokenizer(FileInfo fileInfo)
 	{
 		using (StreamReader streamReader = fileInfo.OpenText())
 		{
-			_instructions = _commentsRegex.Replace(streamReader.ReadToEnd(), "")
+			string rawInstructions = streamReader.ReadToEnd();
+			_instructions = CompilerRegex.ReplaceAllComments(rawInstructions, "")
 				.Split("\n")
 				.Select(instruction => instruction.Trim())
 				.Where(instruction => instruction != String.Empty)
@@ -251,18 +210,18 @@ class JackTokenizer
 	private Match _MatchToken()
 	{
 		Match? match = null;
-		Func<Match>[] matchers = new Func<Match>[] {
-			_IsKeyword,
-			_IsSymbol,
-			_IsIntegerConstant,
-			_IsStringConstant,
-			_IsIdentifier
+		Func<string, int, Match>[] matchers = new Func<string, int, Match>[] {
+			CompilerRegex.IsKeyword,
+			CompilerRegex.IsSymbol,
+			CompilerRegex.IsIntegerConstant,
+			CompilerRegex.IsStringConstant,
+			CompilerRegex.IsIdentifier
 		};
 
 		for (int i = 0; i < matchers.Length; i++)
 		{
-			Func<Match> matcher = matchers[i];
-			Match tempMatch = matcher.Invoke();
+			Func<string, int, Match> matcher = matchers[i];
+			Match tempMatch = matcher.Invoke(_currentInstruction, _offset);
 			if (tempMatch.Success && tempMatch.Index == _offset)
 			{
 				match = tempMatch;
@@ -294,40 +253,9 @@ class JackTokenizer
 
 		if (match is null)
 		{
-			match = _IsSpace();
+			match = CompilerRegex.IsSpace(_currentInstruction, _offset);
 		}
 
 		return match;
-	}
-
-	private Match _IsKeyword()
-	{
-		return _keywordRegex.Match(_currentInstruction, _offset);
-	}
-
-	private Match _IsSymbol()
-	{
-		return _symbolRegex.Match(_currentInstruction, _offset);
-	}
-
-	private Match _IsIntegerConstant()
-	{
-
-		return _integerConstantRegex.Match(_currentInstruction, _offset);
-	}
-
-	private Match _IsStringConstant()
-	{
-		return _stringConstantRegex.Match(_currentInstruction, _offset);
-	}
-
-	private Match _IsIdentifier()
-	{
-		return _identifierRegex.Match(_currentInstruction, _offset);
-	}
-
-	private Match _IsSpace()
-	{
-		return _spaceRegex.Match(_currentInstruction, _offset);
 	}
 }
