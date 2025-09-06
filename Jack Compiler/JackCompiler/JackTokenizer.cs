@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace JackCompiler;
 
-class JackTokenizer
+internal class JackTokenizer
 {
 	private string[] _instructions;
 	private int _pointer = 0;
