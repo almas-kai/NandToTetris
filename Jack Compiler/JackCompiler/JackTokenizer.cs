@@ -7,8 +7,9 @@ internal class JackTokenizer
 	private string[] _instructions;
 	private int _pointer = 0;
 	private int _offset = 0;
-	private string _currentInstruction = String.Empty;
+	private string _currentInstruction = string.Empty;
 	public (TokenType Type, string Value) CurrentToken { get; private set; }
+	public bool HasMoreTokens { get; private set; }
 
 	public JackTokenizer(FileInfo fileInfo)
 	{
@@ -18,7 +19,7 @@ internal class JackTokenizer
 			_instructions = CompilerRegex.ReplaceAllComments(rawInstructions, "")
 				.Split("\n")
 				.Select(instruction => instruction.Trim())
-				.Where(instruction => instruction != String.Empty)
+				.Where(instruction => instruction != string.Empty)
 				.ToArray();
 		}
 		if (_instructions.Length > 0)
@@ -26,7 +27,6 @@ internal class JackTokenizer
 			HasMoreTokens = true;
 		}
 	}
-	public bool HasMoreTokens { get; private set; }
 	public void Advance()
 	{
 		if (HasMoreTokens is false)
@@ -157,12 +157,12 @@ internal class JackTokenizer
 		}
 		using (StreamWriter writer = new StreamWriter(fullPath))
 		{
-			Advance();
 			writer.WriteLine("<tokens>");
+			Advance();
 			while (HasMoreTokens)
 			{
-				TokenType Type = GetTokenType();
-				switch (Type)
+				TokenType type = CurrentToken.Type;
+				switch (type)
 				{
 					case TokenType.KEYWORD:
 						Keyword keyword = GetKeyword();
@@ -184,6 +184,8 @@ internal class JackTokenizer
 						string stringConstant = GetString();
 						writer.WriteLine($"<stringConstant> {stringConstant} </stringConstant>");
 						break;
+					default:
+						throw new FormatException($"Tokenizer error. Cannot generate testing XML file. Unrecognized token type: \"{type}\".");
 				}
 				Advance();
 			}
@@ -195,6 +197,35 @@ internal class JackTokenizer
 		{
 			HasMoreTokens = true;
 		}
+	}
+	public (TokenType type, string value) Peek()
+	{
+		TokenType type = TokenType.KEYWORD;
+		string value = string.Empty;
+		if (HasMoreTokens)
+		{
+			string instruction = _currentInstruction;
+			int offest = _offset;
+			bool isEnd = false;
+			if (offest == instruction.Length)
+			{
+				if (_pointer < _instructions.Length)
+				{
+					instruction = _instructions[_pointer];
+					offest = 0;
+				}
+				else
+				{
+					isEnd = true;
+				}
+			}
+			if (!isEnd)
+			{
+				_MatchToken(instruction, offest, out (TokenType, string) token);
+				return token;
+			}
+		}
+		return (type, value);
 	}
 	private void _Next()
 	{
@@ -213,7 +244,7 @@ internal class JackTokenizer
 	private Match _MatchToken(string instruction, int offset, out (TokenType type, string value) token)
 	{
 		Match? match = null;
-		string Value = String.Empty;
+		string Value = string.Empty;
 		TokenType Type = TokenType.KEYWORD;
 		Func<string, int, Match>[] matchers = new Func<string, int, Match>[] {
 			CompilerRegex.IsKeyword,
