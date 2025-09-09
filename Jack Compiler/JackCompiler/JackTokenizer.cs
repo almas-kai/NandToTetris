@@ -207,6 +207,7 @@ internal class JackTokenizer
 			string instruction = _currentInstruction;
 			int offest = _offset;
 			bool isEnd = false;
+			AdvanceLabel:
 			if (offest == instruction.Length)
 			{
 				if (_pointer < _instructions.Length)
@@ -221,8 +222,20 @@ internal class JackTokenizer
 			}
 			if (!isEnd)
 			{
-				_MatchToken(instruction, offest, out (TokenType, string) token);
-				return token;
+				Match match = _MatchToken(instruction, offest, out (TokenType, string) token);
+				if (match.Success)
+				{
+					if (match.Value == " ")
+					{
+						offest += 1;
+						goto AdvanceLabel;
+					}
+					else
+					{
+						return token;
+					}
+				}
+				throw new InvalidOperationException($"Match wasn't successful. Match value: {match.Value}, match index: {match.Index}. Instruction: {instruction}.");
 			}
 		}
 		return (type, value);

@@ -31,4 +31,30 @@ public class JackTokenizerTests
 
         Assert.AreEqual(expected, actual);
     }
+
+    [TestMethod()]
+    [DataRow(0, TokenType.KEYWORD, "class")]
+    [DataRow(1, TokenType.IDENTIFIER, "Main")]
+    [DataRow(139, TokenType.SYMBOL, "}")]
+    [DataRow(3, TokenType.KEYWORD, "function")]
+    [DataRow(104, TokenType.IDENTIFIER, "i")]
+    [DataRow(89, TokenType.SYMBOL, "<")]
+    [DataRow(86, TokenType.KEYWORD, "while")]
+    [DataRow(137, TokenType.SYMBOL, ";")]
+    [DataRow(73, TokenType.INT_CONST, "1")]
+    [DataRow(65, TokenType.STRING_CONST, "ENTER THE NEXT NUMBER: ")]
+    public void Peek_UsingPeekOnArrayTestFiles_WorksAsExpected(int instructionIndexAfterWhichWePeek, TokenType expectedTokenType, string expectedTokenValue)
+    {
+        (TokenType, string) expected = (expectedTokenType, expectedTokenValue);
+        FileInfo fileInfo = new FileInfo(@"./Assets/ArrayTestFiles/Main.jack");
+        JackTokenizer jackTokenizer = new JackTokenizer(fileInfo);
+
+        for (int i = 0; i < instructionIndexAfterWhichWePeek; i++)
+        {
+            jackTokenizer.Advance();
+        }
+        (TokenType type, string value) actual = jackTokenizer.Peek();
+
+        Assert.AreEqual(expected, actual);
+    }
 }
