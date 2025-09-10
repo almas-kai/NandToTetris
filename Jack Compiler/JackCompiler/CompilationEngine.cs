@@ -440,7 +440,6 @@ class CompilationEngine : IDisposable
 	private void CompileIf()
 	{
 		bool isDone = false;
-		bool isNested = false;
 		_Write("<ifStatement>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
@@ -451,15 +450,7 @@ class CompilationEngine : IDisposable
 					Keyword keyword = _jackTokenizer.GetKeyword();
 					if (keyword is Keyword.IF)
 					{
-						if (isNested == false)
-						{
-							isNested = true;
-							_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
-						}
-						else
-						{
-							CompileIf();
-						}
+						_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
 					}
 					else if (keyword is Keyword.ELSE)
 					{
@@ -474,7 +465,25 @@ class CompilationEngine : IDisposable
 					string symbol = _jackTokenizer.GetSymbol();
 					if (symbol == "(")
 					{
-						
+						CompileExpression();
+						string afterSymbol = _jackTokenizer.GetSymbol();
+						_Write($"<symbol> {afterSymbol} </symbol>");
+					}
+					else if (symbol == "{")
+					{
+						_Write($"<symbol> {symbol} </symbol>");
+						CompileStatements();
+						string afterSymbol = _jackTokenizer.GetSymbol();
+						_Write($"<symbol> {afterSymbol} </symbol>");
+						(TokenType type, string value) token = _jackTokenizer.Peek();
+						if (!(token.type is TokenType.KEYWORD && token.value == "else"))
+						{
+							isDone = true;
+						}
+					}
+					else
+					{
+						throw new FormatException($"Unrecognized symbol: \"{symbol}\".");
 					}
 					break;
 				default:
@@ -488,9 +497,123 @@ class CompilationEngine : IDisposable
 		}
 		_Write("</ifStatement>");
 	}
-	private void CompileWhile() { }
-	private void CompileDo() { }
-	private void CompileReturn() { }
+	private void CompileWhile()
+	{
+		bool isDone = false;
+		_Write("<whileStatement>");
+		while (_jackTokenizer.HasMoreTokens)
+		{
+			TokenType tokenType = _jackTokenizer.GetTokenType();
+			switch (tokenType)
+			{
+				case TokenType.KEYWORD:
+					Keyword keyword = _jackTokenizer.GetKeyword();
+					if (keyword == Keyword.WHILE)
+					{
+						_Write($"<keyword> {keyword} </keyword>");
+					}
+					else
+					{
+						throw new FormatException($"Unrecognized keyword type: \"{keyword}\".");
+					}
+					break;
+				case TokenType.SYMBOL:
+					string symbol = _jackTokenizer.GetSymbol();
+					if (symbol == "(")
+					{
+						_Write($"<symbol> {symbol} </symbol>");
+						CompileExpression();
+						string afterSymbol = _jackTokenizer.GetSymbol();
+						_Write($"<symbol> {afterSymbol} </symbol>");
+					}
+					else if (symbol == "{")
+					{
+						_Write($"<symbol> {symbol} </symbol>");
+						CompileStatements();
+						string afterSymbol = _jackTokenizer.GetSymbol();
+						_Write($"<symbol> {afterSymbol} </symbol>");
+						isDone = true;
+					}
+					else
+					{
+						throw new FormatException($"Unrecognized symbol type: \"{symbol}\".");
+					}
+					break;
+				default:
+					throw new FormatException($"Unrecognized token type: \"{tokenType}\".");
+			}
+			if (isDone)
+			{
+				break;
+			}
+			_jackTokenizer.Advance();
+		}
+		_Write("</whileStatement>");
+	}
+	private void CompileDo()
+	{
+		bool isDone = false;
+		_Write("<doStatement>");
+		while (_jackTokenizer.HasMoreTokens)
+		{
+			TokenType tokenType = _jackTokenizer.GetTokenType();
+			switch (tokenType)
+			{
+				case TokenType.KEYWORD:
+					Keyword keyword = _jackTokenizer.GetKeyword();
+					if (keyword is Keyword.DO)
+					{
+						_Write($"<keyword> {keyword} </keyword>");
+					}
+					else
+					{
+						throw new FormatException($"Unrecognized keyword type: \"{keyword}\".");
+					}
+					break;
+				case TokenType.IDENTIFIER:
+					string identifier = _jackTokenizer.GetIdentifier();
+					_Write($"<identifier> {identifier} </identifier>");
+					break;
+				case TokenType.SYMBOL:
+					string symbol = _jackTokenizer.GetSymbol();
+					_Write($"<symbol> {symbol} </symbol>");
+					if (symbol == "(")
+					{
+						CompileExpressionList();
+						string afterSymbol = _jackTokenizer.GetSymbol();
+						_Write($"<symbol> {afterSymbol} </symbol>");
+					}
+					else if (symbol == "." || symbol == ";")
+					{
+						_Write($"<symbol> {symbol} </symbol>");
+						isDone = symbol == ";" ? true : false;
+					}
+					else
+					{
+						throw new FormatException($"Unrecognized symbol type: \"{symbol}\".");
+					}
+					break;
+				default:
+					throw new FormatException($"Unrecognized token type: \"{tokenType}\".");
+			}
+			if (isDone)
+			{
+				break;
+			}
+			_jackTokenizer.Advance();
+		}
+		_Write("</doStatement>");
+	}
+	private void CompileReturn()
+	{
+		bool isDone = false;
+		_Write("<returnStatement>");
+		while (_jackTokenizer.HasMoreTokens)
+		{
+			TokenType tokenType = _jackTokenizer.GetTokenType();
+		}
+		_Write("</returnStatement>");
+	}
 	private void CompileExpression() { }
 	private void CompileTerm() { }
 	private int CompileExpressionList()
