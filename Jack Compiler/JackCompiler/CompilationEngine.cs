@@ -704,7 +704,7 @@ class CompilationEngine : IDisposable
 				case TokenType.IDENTIFIER:
 					string identifier = _jackTokenizer.GetIdentifier();
 					(TokenType type, string value) token = _jackTokenizer.Peek();
-					// if(token.value == "[" || token.value == "(" || token.value == ".") {}
+					_Write($"<identifier> {identifier} </identifier>");
 					if (token.value == "[")
 					{
 						_jackTokenizer.Advance();
@@ -712,7 +712,6 @@ class CompilationEngine : IDisposable
 						CompileExpression();
 						string afterSymbol = _jackTokenizer.GetSymbol();
 						_Write($"<symbol> {afterSymbol} </symbol>");
-						isDone = true;
 					}
 					else if (token.value == "(")
 					{
@@ -721,12 +720,23 @@ class CompilationEngine : IDisposable
 						CompileExpression();
 						string afterSymbol = _jackTokenizer.GetSymbol();
 						_Write($"<symbol> {afterSymbol} </symbol>");
-						isDone = true;
 					}
-					else if(token.value != ".")
+					else if (token.value == ".")
 					{
-						throw new FormatException($"Unrecognized token peek value: \"{token.value}\".");
+						_Write($"<symbol> {token.value} </symbol>");
+						_jackTokenizer.Advance();
+						_jackTokenizer.Advance();
+						string secondIdentifier = _jackTokenizer.GetIdentifier();
+						_Write($"<identifier> {secondIdentifier} </identifier>");
+						_jackTokenizer.Advance();
+						string symbol = _jackTokenizer.GetSymbol();
+						_Write($"<symbol> {symbol} </symbol>");
+						_jackTokenizer.Advance();
+						CompileExpressionList();
+						string afterSymbol = _jackTokenizer.GetSymbol();
+						_Write($"<symbol> {afterSymbol} </symbol>");
 					}
+					isDone = true;
 					break;
 				default:
 					throw new FormatException($"Unrecognized token type: \"{tokenType}\".");
