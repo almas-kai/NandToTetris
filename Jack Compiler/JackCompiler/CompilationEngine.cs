@@ -661,7 +661,28 @@ class CompilationEngine : IDisposable
 		_Write("<expression>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			
+			TokenType tokenType = _jackTokenizer.GetTokenType();
+			switch (tokenType)
+			{
+				case TokenType.SYMBOL:
+					string symbol = _jackTokenizer.GetSymbol();
+					if (symbol == "+" || symbol == "-" || symbol == "*" || symbol == "/" || symbol == "&" || symbol == "|" || symbol == "<" || symbol == ">" || symbol == "=")
+					{
+						_Write($"<symbol> {symbol} </symbol>");
+					}
+					else if (symbol == ";" || symbol == ")" || symbol == "]")
+					{
+						isDone = true;
+					}
+					else
+					{
+						throw new FormatException($"Unrecognized symbol type: \"{symbol}\".");
+					}
+					break;
+				default:
+					CompileTerm();
+					break;
+			}
 			if (isDone)
 			{
 				break;
@@ -737,6 +758,17 @@ class CompilationEngine : IDisposable
 						_Write($"<symbol> {afterSymbol} </symbol>");
 					}
 					isDone = true;
+					break;
+				case TokenType.SYMBOL:
+					string unaryOp = _jackTokenizer.GetSymbol();
+					if (unaryOp == "-" || unaryOp == "~")
+					{
+						_Write($"<symbol> {unaryOp} </symbol>");
+					}
+					else
+					{
+						throw new FormatException($"Unrecognized symbol type: \"{unaryOp}\".");
+					}
 					break;
 				default:
 					throw new FormatException($"Unrecognized token type: \"{tokenType}\".");
