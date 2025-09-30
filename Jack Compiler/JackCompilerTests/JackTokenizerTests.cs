@@ -7,13 +7,13 @@ namespace JackCompilerTests;
 public class JackTokenizerTests
 {
     [TestMethod()]
-    [DataRow(@"./Assets/ArrayTestFiles/Main.jack", @"./Assets/ArrayTestFiles/ValidOutput/MainT.xml")]
-    [DataRow(@"./Assets/ExpressionLessSquare/Main.jack", @"./Assets/ExpressionLessSquare/ValidOutput/MainT.xml")]
-    [DataRow(@"./Assets/ExpressionLessSquare/Square.jack", @"./Assets/ExpressionLessSquare/ValidOutput/SquareT.xml")]
-    [DataRow(@"./Assets/ExpressionLessSquare/SquareGame.jack", @"./Assets/ExpressionLessSquare/ValidOutput/SquareGameT.xml")]
-    [DataRow(@"./Assets/Square/Main.jack", @"./Assets/Square/ValidOutput/MainT.xml")]
-    [DataRow(@"./Assets/Square/Square.jack", @"./Assets/Square/ValidOutput/SquareT.xml")]
-    [DataRow(@"./Assets/Square/SquareGame.jack", @"./Assets/Square/ValidOutput/SquareGameT.xml")]
+    [DataRow("./Assets/ArrayTestFiles/Main.jack", "./Assets/ArrayTestFiles/ValidOutput/MainT.xml")]
+    [DataRow("./Assets/ExpressionLessSquare/Main.jack", "./Assets/ExpressionLessSquare/ValidOutput/MainT.xml")]
+    [DataRow("./Assets/ExpressionLessSquare/Square.jack", "./Assets/ExpressionLessSquare/ValidOutput/SquareT.xml")]
+    [DataRow("./Assets/ExpressionLessSquare/SquareGame.jack", "./Assets/ExpressionLessSquare/ValidOutput/SquareGameT.xml")]
+    [DataRow("./Assets/Square/Main.jack", "./Assets/Square/ValidOutput/MainT.xml")]
+    [DataRow("./Assets/Square/Square.jack", "./Assets/Square/ValidOutput/SquareT.xml")]
+    [DataRow("./Assets/Square/SquareGame.jack", "./Assets/Square/ValidOutput/SquareGameT.xml")]
     public void GenerateTestingXMLFile_PassingValidInput_GeneratesCorrectOutput(string inputPath, string validFilePath)
     {
         bool expected = true;
@@ -46,7 +46,7 @@ public class JackTokenizerTests
     public void Peek_UsingPeekOnArrayTestFiles_WorksAsExpected(int instructionIndexAfterWhichWePeek, int expectedTokenType, string expectedTokenValue)
     {
         (TokenType, string) expected = ((TokenType)expectedTokenType, expectedTokenValue);
-        FileInfo fileInfo = new FileInfo(@"./Assets/ArrayTestFiles/Main.jack");
+        FileInfo fileInfo = new FileInfo("./Assets/ArrayTestFiles/Main.jack");
         JackTokenizer jackTokenizer = new JackTokenizer(fileInfo);
 
         for (int i = 0; i < instructionIndexAfterWhichWePeek; i++)
