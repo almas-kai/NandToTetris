@@ -43,9 +43,9 @@ public class JackTokenizerTests
     [DataRow(137, TokenType.SYMBOL, ";")]
     [DataRow(73, TokenType.INT_CONST, "1")]
     [DataRow(65, TokenType.STRING_CONST, "ENTER THE NEXT NUMBER: ")]
-    public void Peek_UsingPeekOnArrayTestFiles_WorksAsExpected(int instructionIndexAfterWhichWePeek, TokenType expectedTokenType, string expectedTokenValue)
+    public void Peek_UsingPeekOnArrayTestFiles_WorksAsExpected(int instructionIndexAfterWhichWePeek, int expectedTokenType, string expectedTokenValue)
     {
-        (TokenType, string) expected = (expectedTokenType, expectedTokenValue);
+        (TokenType, string) expected = ((TokenType)expectedTokenType, expectedTokenValue);
         FileInfo fileInfo = new FileInfo(@"./Assets/ArrayTestFiles/Main.jack");
         JackTokenizer jackTokenizer = new JackTokenizer(fileInfo);
 

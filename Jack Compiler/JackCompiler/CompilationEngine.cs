@@ -1,6 +1,6 @@
 namespace JackCompiler;
 
-class CompilationEngine : IDisposable
+internal class CompilationEngine : IDisposable
 {
 	private readonly JackTokenizer _jackTokenizer;
 	private readonly string _outputFileName;

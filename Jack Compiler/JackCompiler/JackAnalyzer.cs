@@ -1,10 +1,7 @@
 ﻿namespace JackCompiler;
 
-class JackAnalyzer
+internal class JackAnalyzer
 {
-    private const string JACK_EXTENSION = ".jack";
-    private const string XML_EXTENSION = ".xml";
-    private const string TOKENIZED_OUTPUT = "T";
     static void Main(string[] args)
     {
         if (args.Length != 1)
@@ -17,9 +14,9 @@ class JackAnalyzer
             List<string> filesToCompile = new List<string>();
             if (Directory.Exists(potentialPath))
             {
-                filesToCompile.AddRange(Directory.GetFiles(potentialPath).Where(f => f.EndsWith(JACK_EXTENSION)));
+                filesToCompile.AddRange(Directory.GetFiles(potentialPath).Where(f => f.EndsWith(FileExtensions.JACK_EXTENSION)));
             }
-            else if (potentialPath.EndsWith(JACK_EXTENSION) && File.Exists(potentialPath))
+            else if (potentialPath.EndsWith(FileExtensions.JACK_EXTENSION) && File.Exists(potentialPath))
             {
                 filesToCompile.Add(potentialPath);
             }
@@ -33,12 +30,12 @@ class JackAnalyzer
                 FileInfo fileInfo = new FileInfo(fileName);
                 JackTokenizer jackTokenizer = new JackTokenizer(fileInfo);
 
-                string outputPathForTestingXMLFile = fileName.Replace(JACK_EXTENSION, TOKENIZED_OUTPUT + XML_EXTENSION);
+                string outputPathForTestingXMLFile = fileName.Replace(FileExtensions.JACK_EXTENSION, FileExtensions.TOKENIZED_OUTPUT + FileExtensions.XML_EXTENSION);
 
                 // Testing generation must be called before any Advance calls.
                 jackTokenizer.GenerateTestingXMLFile(outputPathForTestingXMLFile);
 
-                string outputFileName = fileName.Replace(JACK_EXTENSION, XML_EXTENSION);
+                string outputFileName = fileName.Replace(FileExtensions.JACK_EXTENSION, FileExtensions.XML_EXTENSION);
             }
         }
     }

@@ -1,11 +1,11 @@
 namespace JackCompiler;
 
-public enum Keyword
+internal enum Keyword
 {
 	CLASS,
-	METHOD,
 	FUNCTION,
 	CONSTRUCTOR,
+	METHOD,
 	INT,
 	BOOLEAN,
 	CHAR,

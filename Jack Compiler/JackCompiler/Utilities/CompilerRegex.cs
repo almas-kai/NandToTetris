@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace JackCompiler;
 
-public static class CompilerRegex
+internal static class CompilerRegex
 {
 	private static readonly Regex _commentsRegex = new Regex(@"//.*|/\*[\s\S]*?\*/", RegexOptions.Compiled);
 	private static readonly Regex _keywordRegex = new Regex(@"\b(class|constructor|function|method|field|static|var|int|char|boolean|void|true|false|null|this|let|do|if|else|while|return)\b", RegexOptions.Compiled);

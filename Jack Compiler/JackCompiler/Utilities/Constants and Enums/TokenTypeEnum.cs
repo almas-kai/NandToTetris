@@ -1,6 +1,6 @@
 namespace JackCompiler;
 
-public enum TokenType
+internal enum TokenType
 {
 	KEYWORD,
 	SYMBOL,
