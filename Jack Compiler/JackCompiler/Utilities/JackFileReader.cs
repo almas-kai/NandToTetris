@@ -5,15 +5,11 @@ namespace JackCompiler;
 internal class JackFileReader : IEnumerable<FileInfo>
 {
 	private string _Path;
-
+	public bool IsCorrectPath { get; private set; }
 	public JackFileReader(string path)
 	{
 		_Path = path;
-	}
-
-	public bool IsCorrectPath()
-	{
-		return _IsCorrectFilePath() || _IsCorrectFolderPath();
+		IsCorrectPath = _IsCorrectFilePath() || _IsCorrectFolderPath();
 	}
 	private bool _IsCorrectFilePath()
 	{

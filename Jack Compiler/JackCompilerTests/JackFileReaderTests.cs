@@ -18,7 +18,7 @@ public class JackFileReaderTests
 		bool expected = true;
 		JackFileReader jackFileReader = new JackFileReader(correctFilePath);
 
-		bool actual = jackFileReader.IsCorrectPath();
+		bool actual = jackFileReader.IsCorrectPath;
 
 		Assert.AreEqual(expected, actual);
 	}
@@ -32,21 +32,21 @@ public class JackFileReaderTests
 		bool expected = true;
 		JackFileReader jackFileReader = new JackFileReader(correctFolderPath);
 
-		bool actual = jackFileReader.IsCorrectPath();
+		bool actual = jackFileReader.IsCorrectPath;
 
 		Assert.AreEqual(expected, actual);
 	}
 
 	[TestMethod()]
-	[DataRow("./Assets/ArrayTestFiles/Main")]
+	[DataRow("./Assets/ArrayTestFiles/Main.hack")]
 	[DataRow("./Assets/ArrayTestFiles/NonExistingFile.jack")]
-	[DataRow("./Assets/RandomFolderWithoutJackFiles")]
+	[DataRow("./Assets/RandomFolderWithoutJackFiles/")]
 	public void IsCorrectPath_PassingIncorrectPath_ReturnsFalse(string incorrectPath)
 	{
 		bool expected = false;
 		JackFileReader jackFileReader = new JackFileReader(incorrectPath);
 
-		bool actual = jackFileReader.IsCorrectPath();
+		bool actual = jackFileReader.IsCorrectPath;
 
 		Assert.AreEqual(expected, actual);
 	}

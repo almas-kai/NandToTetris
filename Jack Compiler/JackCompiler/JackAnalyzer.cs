@@ -13,7 +13,7 @@ internal class JackAnalyzer
             string potentialPath = args[0].Trim();
             JackFileReader jackFileReader = new JackFileReader(potentialPath);
 
-            if (jackFileReader.IsCorrectPath() is false)
+            if (jackFileReader.IsCorrectPath is false)
             {
                 Console.WriteLine("Make sure that the path is correct. The program accepts the \'.jack\' file or the path to the folder that contains \'.jack\' files.");
                 return;
