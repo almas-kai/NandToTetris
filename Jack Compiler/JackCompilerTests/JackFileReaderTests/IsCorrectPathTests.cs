@@ -3,7 +3,7 @@ using JackCompiler;
 namespace JackCompilerTests;
 
 [TestClass()]
-public class JackFileReaderTests
+public class IsCorrectPathTests
 {
 	[TestMethod()]
 	[DataRow("./Assets/ArrayTestFiles/Main.jack")]
@@ -15,12 +15,11 @@ public class JackFileReaderTests
 	[DataRow("./Assets/Square/SquareGame.jack")]
 	public void IsCorrectPath_PassingCorrectFilePath_ReturnTrue(string correctFilePath)
 	{
-		bool expected = true;
 		JackFileReader jackFileReader = new JackFileReader(correctFilePath);
 
-		bool actual = jackFileReader.IsCorrectPath;
+		bool isCorrectPath = jackFileReader.IsCorrectPath;
 
-		Assert.AreEqual(expected, actual);
+		Assert.IsTrue(isCorrectPath, "Correct path must result in truthy IsCorrectPath property.");
 	}
 
 	[TestMethod()]
@@ -29,12 +28,11 @@ public class JackFileReaderTests
 	[DataRow("./Assets/Square/")]
 	public void IsCorrectPath_PassingCorrectFolderPath_ReturnsTrue(string correctFolderPath)
 	{
-		bool expected = true;
 		JackFileReader jackFileReader = new JackFileReader(correctFolderPath);
 
-		bool actual = jackFileReader.IsCorrectPath;
+		bool isCorrectPath = jackFileReader.IsCorrectPath;
 
-		Assert.AreEqual(expected, actual);
+		Assert.IsTrue(isCorrectPath, "Correct path must result in truthy IsCorrectPath property.");
 	}
 
 	[TestMethod()]
@@ -43,11 +41,10 @@ public class JackFileReaderTests
 	[DataRow("./Assets/RandomFolderWithoutJackFiles/")]
 	public void IsCorrectPath_PassingIncorrectPath_ReturnsFalse(string incorrectPath)
 	{
-		bool expected = false;
 		JackFileReader jackFileReader = new JackFileReader(incorrectPath);
 
-		bool actual = jackFileReader.IsCorrectPath;
+		bool isCorrectPath = jackFileReader.IsCorrectPath;
 
-		Assert.AreEqual(expected, actual);
+		Assert.IsFalse(isCorrectPath, "Incorrect path must result in falsy IsCorrectPath property.");
 	}
 }
