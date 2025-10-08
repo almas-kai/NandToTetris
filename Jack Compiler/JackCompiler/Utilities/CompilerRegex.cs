@@ -15,33 +15,33 @@ internal static class CompilerRegex
 	{
 		return _commentsRegex.Replace(instruction, replacement);
 	}
-	public static Match IsKeyword(string instruction, int offset)
+	public static Match IsKeyword(string instruction)
 	{
-		return _keywordRegex.Match(instruction, offset);
+		return _keywordRegex.Match(instruction);
 	}
-	public static Match IsSymbol(string instruction, int offset)
+	public static Match IsSymbol(string instruction)
 	{
-		return _symbolRegex.Match(instruction, offset);
-	}
-
-	public static Match IsIntegerConstant(string instruction, int offset)
-	{
-
-		return _integerConstantRegex.Match(instruction, offset);
+		return _symbolRegex.Match(instruction);
 	}
 
-	public static Match IsStringConstant(string instruction, int offset)
+	public static Match IsIntegerConstant(string instruction)
 	{
-		return _stringConstantRegex.Match(instruction, offset);
+
+		return _integerConstantRegex.Match(instruction);
 	}
 
-	public static Match IsIdentifier(string instruction, int offset)
+	public static Match IsStringConstant(string instruction)
 	{
-		return _identifierRegex.Match(instruction, offset);
+		return _stringConstantRegex.Match(instruction);
 	}
 
-	public static Match IsSpace(string instruction, int offset)
+	public static Match IsIdentifier(string instruction)
 	{
-		return _spaceRegex.Match(instruction, offset);
+		return _identifierRegex.Match(instruction);
+	}
+
+	public static Match IsSpace(string instruction)
+	{
+		return _spaceRegex.Match(instruction);
 	}
 }
