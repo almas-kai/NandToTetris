@@ -21,14 +21,15 @@ internal class CompilationEngine : IDisposable
 		_jackTokenizer.Advance();
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.KEYWORD:
 					Keyword keyword = _jackTokenizer.GetKeyword();
 					if (keyword is Keyword.CLASS)
 					{
-						_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						string keywordAsString = KeywordToString.ConvertToLower(keyword);
+						_Write($"<keyword> {keywordAsString} </keyword>");
 					}
 					else if (keyword is Keyword.STATIC || keyword is Keyword.FIELD)
 					{
@@ -62,14 +63,15 @@ internal class CompilationEngine : IDisposable
 		_Write("<classVarDec>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.KEYWORD:
 					Keyword keyword = _jackTokenizer.GetKeyword();
 					if (keyword is Keyword.STATIC || keyword is Keyword.FIELD || _IsPrimitiveType(keyword))
 					{
-						_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						string keywordAsString = KeywordToString.ConvertToLower(keyword);
+						_Write($"<keyword> {keywordAsString} </keyword>");
 					}
 					else
 					{
@@ -112,14 +114,15 @@ internal class CompilationEngine : IDisposable
 		_Write("<subroutineDec>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.KEYWORD:
 					Keyword keyword = _jackTokenizer.GetKeyword();
 					if (keyword is Keyword.FUNCTION || keyword is Keyword.METHOD || keyword is Keyword.CONSTRUCTOR || keyword is Keyword.VOID || _IsPrimitiveType(keyword))
 					{
-						_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						string keywordAsString = KeywordToString.ConvertToLower(keyword);
+						_Write($"<keyword> {keywordAsString} </keyword>");
 					}
 					break;
 				case TokenType.IDENTIFIER:
@@ -168,14 +171,15 @@ internal class CompilationEngine : IDisposable
 		_Write("<parameterList>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.KEYWORD:
 					Keyword keyword = _jackTokenizer.GetKeyword();
 					if (_IsPrimitiveType(keyword))
 					{
-						_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						string keywordAsString = KeywordToString.ConvertToLower(keyword);
+						_Write($"<keyword> {keywordAsString} </keyword>");
 					}
 					else
 					{
@@ -218,7 +222,7 @@ internal class CompilationEngine : IDisposable
 		_Write("<subroutineBody>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.KEYWORD:
@@ -278,14 +282,15 @@ internal class CompilationEngine : IDisposable
 		_Write("<varDec>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.KEYWORD:
 					Keyword keyword = _jackTokenizer.GetKeyword();
 					if (keyword is Keyword.VAR || _IsPrimitiveType(keyword))
 					{
-						_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						string keywordAsString = KeywordToString.ConvertToLower(keyword);
+						_Write($"<keyword> {keywordAsString} </keyword>");
 					}
 					else
 					{
@@ -328,7 +333,7 @@ internal class CompilationEngine : IDisposable
 		_Write("<statements>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.KEYWORD:
@@ -386,14 +391,15 @@ internal class CompilationEngine : IDisposable
 		_Write("<letStatement>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.KEYWORD:
 					Keyword keyword = _jackTokenizer.GetKeyword();
 					if (keyword is Keyword.LET)
 					{
-						_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						string keywordAsString = KeywordToString.ConvertToLower(keyword);
+						_Write($"<keyword> {keywordAsString} </keyword>");
 					}
 					else
 					{
@@ -443,18 +449,19 @@ internal class CompilationEngine : IDisposable
 		_Write("<ifStatement>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.KEYWORD:
 					Keyword keyword = _jackTokenizer.GetKeyword();
+					string keywordAsString = KeywordToString.ConvertToLower(keyword);
 					if (keyword is Keyword.IF)
 					{
-						_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						_Write($"<keyword> {keywordAsString} </keyword>");
 					}
 					else if (keyword is Keyword.ELSE)
 					{
-						_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						_Write($"<keyword> {keywordAsString} </keyword>");
 					}
 					else
 					{
@@ -503,14 +510,15 @@ internal class CompilationEngine : IDisposable
 		_Write("<whileStatement>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.KEYWORD:
 					Keyword keyword = _jackTokenizer.GetKeyword();
 					if (keyword == Keyword.WHILE)
 					{
-						_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						string keywordAsString = KeywordToString.ConvertToLower(keyword);
+						_Write($"<keyword> {keywordAsString} </keyword>");
 					}
 					else
 					{
@@ -556,14 +564,15 @@ internal class CompilationEngine : IDisposable
 		_Write("<doStatement>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.KEYWORD:
 					Keyword keyword = _jackTokenizer.GetKeyword();
 					if (keyword is Keyword.DO)
 					{
-						_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						string keywordAsString = KeywordToString.ConvertToLower(keyword);
+						_Write($"<keyword> {keywordAsString} </keyword>");
 					}
 					else
 					{
@@ -610,14 +619,15 @@ internal class CompilationEngine : IDisposable
 		_Write("<returnStatement>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.KEYWORD:
 					Keyword keyword = _jackTokenizer.GetKeyword();
 					if (keyword is Keyword.RETURN)
 					{
-						_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						string keywordAsString = KeywordToString.ConvertToLower(keyword);
+						_Write($"<keyword> {keywordAsString} </keyword>");
 						(TokenType type, string value) token = _jackTokenizer.Peek();
 						if (!(token.type is TokenType.SYMBOL && token.value == ";"))
 						{
@@ -661,7 +671,7 @@ internal class CompilationEngine : IDisposable
 		_Write("<expression>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.SYMBOL:
@@ -697,7 +707,7 @@ internal class CompilationEngine : IDisposable
 		_Write("<term>");
 		while (_jackTokenizer.HasMoreTokens)
 		{
-			TokenType tokenType = _jackTokenizer.GetTokenType();
+			TokenType tokenType = _jackTokenizer.CurrentToken.Type;
 			switch (tokenType)
 			{
 				case TokenType.INT_CONST:
@@ -714,7 +724,8 @@ internal class CompilationEngine : IDisposable
 					Keyword keyword = _jackTokenizer.GetKeyword();
 					if (keyword is Keyword.TRUE || keyword is Keyword.FALSE || keyword is Keyword.NULL || keyword is Keyword.THIS)
 					{
-						_Write($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						string keywordAsString = KeywordToString.ConvertToLower(keyword);
+						_Write($"<keyword> {keywordAsString} </keyword>");
 						isDone = true;
 					}
 					else

@@ -2,41 +2,50 @@ namespace JackCompiler;
 
 internal static class TXMLGenerator
 {
-	public static void GenerateTestingXMLFile(string fullPath)
+	public static void GenerateTestingXMLFile(FileInfo jackFile)
 	{
-		using (StreamWriter writer = new StreamWriter(fullPath))
+		if (JackFileReader.IsCorrectFilePath(jackFile.FullName) is false)
+		{
+			throw new InvalidOperationException("The provided file is not a '.jack' file, or the file doesn't exist.");
+		}
+
+		JackTokenizer jackTokenizer = new JackTokenizer(jackFile);
+
+		string outputTokenFile = jackFile.FullName.Replace(FileExtensions.JACK_EXTENSION, FileExtensions.TOKENIZED_OUTPUT);
+
+		using (StreamWriter writer = new StreamWriter(outputTokenFile))
 		{
 			writer.WriteLine("<tokens>");
-			Advance();
-			while (HasMoreTokens)
+			jackTokenizer.Advance();
+			while (jackTokenizer.HasMoreTokens)
 			{
-				TokenType type = CurrentToken.Type;
+				TokenType type = jackTokenizer.CurrentToken.Type;
 				switch (type)
 				{
 					case TokenType.KEYWORD:
-						Keyword keyword = GetKeyword();
-						writer.WriteLine($"<keyword> {keyword.ToString().ToLower()} </keyword>");
+						Keyword keyword = jackTokenizer.GetKeyword();
+						writer.WriteLine($"<keyword> {KeywordToString.ConvertToLower(keyword)} </keyword>");
 						break;
 					case TokenType.SYMBOL:
-						string symbol = GetSymbol();
+						string symbol = jackTokenizer.GetSymbol();
 						writer.WriteLine($"<symbol> {symbol} </symbol>");
 						break;
 					case TokenType.IDENTIFIER:
-						string identifier = GetIdentifier();
+						string identifier = jackTokenizer.GetIdentifier();
 						writer.WriteLine($"<identifier> {identifier} </identifier>");
 						break;
 					case TokenType.INT_CONST:
-						int intConstant = GetInteger();
+						int intConstant = jackTokenizer.GetInteger();
 						writer.WriteLine($"<integerConstant> {intConstant} </integerConstant>");
 						break;
 					case TokenType.STRING_CONST:
-						string stringConstant = GetString();
+						string stringConstant = jackTokenizer.GetString();
 						writer.WriteLine($"<stringConstant> {stringConstant} </stringConstant>");
 						break;
 					default:
 						throw new FormatException($"Tokenizer error. Cannot generate testing XML file. Unrecognized token type: \"{type}\".");
 				}
-				Advance();
+				jackTokenizer.Advance();
 			}
 			writer.WriteLine("</tokens>");
 		}

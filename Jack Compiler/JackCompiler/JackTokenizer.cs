@@ -54,14 +54,25 @@ internal class JackTokenizer
 			throw new InvalidOperationException("Tokenizer error - Advance method error. Couldn't match the token. Unrecognized token type.");
 		}
 	}
-	public string GetKeyword()
+	public Keyword GetKeyword()
 	{
 		if (CurrentToken.Type is not TokenType.KEYWORD)
 		{
 			throw new InvalidOperationException($"Tokenizer error. Cannot get the keyword. Because token type is not keyword. The token type is \"{CurrentToken.Type}\".");
 		}
 
-		return CurrentToken.Value;
+		bool isValidKeyword = Enum.TryParse<Keyword>(
+			value: CurrentToken.Value,
+			ignoreCase: true,
+			result: out Keyword keyword
+		);
+
+		if (!isValidKeyword)
+		{
+			throw new InvalidOperationException($"Tokenizer error. Unrecognized keyword: \"{CurrentToken.Value}\".");
+		}
+
+		return keyword;
 	}
 	public string GetSymbol()
 	{

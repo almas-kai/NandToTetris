@@ -11,7 +11,7 @@ internal class JackFileReader : IEnumerable<FileInfo>
 	{
 		_Path = path;
 
-		if (_IsCorrectFilePath())
+		if (IsCorrectFilePath(_Path))
 		{
 			_jackFilePaths.Add(new FileInfo(_Path));
 		}
@@ -25,10 +25,6 @@ internal class JackFileReader : IEnumerable<FileInfo>
 
 		IsCorrectPath = _jackFilePaths.Count > 0;
 	}
-	private bool _IsCorrectFilePath()
-	{
-		return _Path.EndsWith(FileExtensions.JACK_EXTENSION) && File.Exists(_Path);
-	}
 	private bool _IsCorrectFolderPath()
 	{
 		if (Directory.Exists(_Path))
@@ -36,6 +32,10 @@ internal class JackFileReader : IEnumerable<FileInfo>
 			return Directory.GetFiles(_Path, $"*{FileExtensions.JACK_EXTENSION}").Any();
 		}
 		return false;
+	}
+	public static bool IsCorrectFilePath(string potentialJackFile)
+	{
+		return potentialJackFile.EndsWith(FileExtensions.JACK_EXTENSION) && File.Exists(potentialJackFile);
 	}
 	IEnumerator<FileInfo> IEnumerable<FileInfo>.GetEnumerator()
 	{
