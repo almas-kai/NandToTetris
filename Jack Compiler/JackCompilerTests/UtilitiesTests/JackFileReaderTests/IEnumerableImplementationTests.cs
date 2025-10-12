@@ -1,7 +1,7 @@
 using System.Collections;
 using JackCompiler;
 
-namespace JackCompilerTests;
+namespace JackCompilerTests.UtilitiesTests.JackFileReaderTests;
 
 [TestClass()]
 public class IEnumerableImplementationTests
