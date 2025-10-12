@@ -26,7 +26,6 @@ internal static class CompilerRegex
 
 	public static Match IsIntegerConstant(string instruction)
 	{
-
 		return _integerConstantRegex.Match(instruction);
 	}
 

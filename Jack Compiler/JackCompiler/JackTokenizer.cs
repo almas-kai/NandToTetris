@@ -14,6 +14,7 @@ internal class JackTokenizer
 		using (StreamReader streamReader = fileInfo.OpenText())
 		{
 			string rawInstructions = streamReader.ReadToEnd();
+
 			_instructionsQueue = new Queue<string>
 			(
 				CompilerRegex.ReplaceAllComments(rawInstructions, "")
@@ -30,19 +31,19 @@ internal class JackTokenizer
 			throw new InvalidOperationException("Tokenizer error - Advance method error. Cannot advance. There are no more instructions.");
 		}
 
-	SpaceToken:
+	SpaceLabel:
 		if (_currentInstruction == string.Empty)
 		{
 			_currentInstruction = _instructionsQueue.Dequeue();
 		}
-		Match tokenMatch = _MatchToken(out (TokenType type, string value) token);
+		Match tokenMatch = _MatchToken(_currentInstruction, out (TokenType type, string value) token);
 
 		if (tokenMatch.Success)
 		{
 			_currentInstruction = _currentInstruction.Remove(0, tokenMatch.Value.Length);
 			if (tokenMatch.Value == " ")
 			{
-				goto SpaceToken;
+				goto SpaceLabel;
 			}
 			else
 			{
@@ -143,15 +144,36 @@ internal class JackTokenizer
 			throw new InvalidOperationException("There are no instructions to peek.");
 		}
 
-		TokenType tokenType = TokenType.UNKNOWN;
-		string tokenValue = string.Empty;
+		string currentInstruction = _currentInstruction;
 
-		//
+	peekLabel:
+		if (currentInstruction == string.Empty)
+		{
+			currentInstruction = _instructionsQueue.Peek();
+		}
 
-		return (tokenType, tokenValue);
+		Match peekMatch = _MatchToken(currentInstruction, out (TokenType type, string value) token);
+
+		if (peekMatch.Success)
+		{
+			currentInstruction = currentInstruction.Remove(0, peekMatch.Value.Length);
+
+			if (peekMatch.Value == " ")
+			{
+				goto peekLabel;
+			}
+			else
+			{
+				return (token.type, token.value);
+			}
+		}
+		else
+		{
+			throw new InvalidOperationException("Tokenizer error. Couldn't peek. Unrecognized token type.");
+		}
 	}
 
-	private Match _MatchToken(out (TokenType type, string value) token)
+	private Match _MatchToken(string instruction, out (TokenType type, string value) token)
 	{
 		Match? match = null;
 		string tokenValue = string.Empty;
@@ -167,10 +189,11 @@ internal class JackTokenizer
 		for (int i = 0; i < tokenTypeMatchers.Length; i++)
 		{
 			Func<string, Match> matcher = tokenTypeMatchers[i];
-			match = matcher.Invoke(_currentInstruction);
-			if (match.Success && match.Index == 0)
+			Match tempMatch = matcher.Invoke(instruction);
+			if (tempMatch.Success && tempMatch.Index == 0)
 			{
-				tokenValue = match.Value;
+				tokenValue = tempMatch.Value;
+				match = tempMatch;
 				switch (i)
 				{
 					case 0:
@@ -198,7 +221,7 @@ internal class JackTokenizer
 
 		if (match is null)
 		{
-			match = CompilerRegex.IsSpace(_currentInstruction);
+			match = CompilerRegex.IsSpace(instruction);
 		}
 
 		token = (tokenType, tokenValue);

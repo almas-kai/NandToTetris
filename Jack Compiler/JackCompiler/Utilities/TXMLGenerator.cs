@@ -2,7 +2,7 @@ namespace JackCompiler;
 
 internal static class TXMLGenerator
 {
-	public static void GenerateTestingXMLFile(FileInfo jackFile)
+	public static void GenerateTestingXMLFile(FileInfo jackFile, string outputTokenFile)
 	{
 		if (JackFileReader.IsCorrectFilePath(jackFile.FullName) is false)
 		{
@@ -11,14 +11,12 @@ internal static class TXMLGenerator
 
 		JackTokenizer jackTokenizer = new JackTokenizer(jackFile);
 
-		string outputTokenFile = jackFile.FullName.Replace(FileExtensions.JACK_EXTENSION, FileExtensions.TOKENIZED_OUTPUT);
-
 		using (StreamWriter writer = new StreamWriter(outputTokenFile))
 		{
 			writer.WriteLine("<tokens>");
-			jackTokenizer.Advance();
 			while (jackTokenizer.HasMoreTokens)
 			{
+				jackTokenizer.Advance();
 				TokenType type = jackTokenizer.CurrentToken.Type;
 				switch (type)
 				{
@@ -45,7 +43,6 @@ internal static class TXMLGenerator
 					default:
 						throw new FormatException($"Tokenizer error. Cannot generate testing XML file. Unrecognized token type: \"{type}\".");
 				}
-				jackTokenizer.Advance();
 			}
 			writer.WriteLine("</tokens>");
 		}

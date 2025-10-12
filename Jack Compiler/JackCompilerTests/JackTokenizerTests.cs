@@ -18,15 +18,11 @@ public class JackTokenizerTests
     {
         bool expected = true;
         FileInfo inputFile = new FileInfo(inputPath);
-        JackTokenizer jackTokenizer = new JackTokenizer(inputFile);
-        string outputPath = Path.Combine(
-            Path.GetDirectoryName(validFilePath)!,
-            Path.GetFileNameWithoutExtension(validFilePath) + "Output.xml"
-        );
-
-        jackTokenizer.GenerateTestingXMLFile(outputPath);
+        string outputFilePath = inputPath.Replace(FileExtensions.JACK_EXTENSION, FileExtensions.TOKENIZED_OUTPUT);
+        TXMLGenerator.GenerateTestingXMLFile(inputFile, outputFilePath);
+        
         XDocument validFile = XDocument.Load(validFilePath);
-        XDocument outputFile = XDocument.Load(outputPath);
+        XDocument outputFile = XDocument.Load(outputFilePath);
         bool actual = XNode.DeepEquals(validFile, outputFile);
 
         Assert.AreEqual(expected, actual);

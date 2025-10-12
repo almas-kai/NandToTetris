@@ -43,6 +43,6 @@ internal class JackFileReader : IEnumerable<FileInfo>
 	}
 	public IEnumerator GetEnumerator()
 	{
-		return GetEnumerator();
+		return ((IEnumerable<FileInfo>)this).GetEnumerator();
 	}
 }
