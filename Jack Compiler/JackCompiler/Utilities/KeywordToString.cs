@@ -1,4 +1,6 @@
-namespace JackCompiler;
+using JackCompiler.Utilities.ConstantsAndEnums;
+
+namespace JackCompiler.Utilities;
 
 internal static class KeywordToString
 {

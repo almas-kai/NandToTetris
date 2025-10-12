@@ -1,4 +1,6 @@
 using System.Text.RegularExpressions;
+using JackCompiler.Utilities;
+using JackCompiler.Utilities.ConstantsAndEnums;
 
 namespace JackCompiler;
 

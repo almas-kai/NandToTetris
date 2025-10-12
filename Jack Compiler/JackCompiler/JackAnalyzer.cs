@@ -1,4 +1,7 @@
-﻿namespace JackCompiler;
+﻿using JackCompiler.Utilities;
+using JackCompiler.Utilities.ConstantsAndEnums;
+
+namespace JackCompiler;
 
 internal class JackAnalyzer
 {

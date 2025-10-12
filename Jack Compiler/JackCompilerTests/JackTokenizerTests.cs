@@ -1,5 +1,7 @@
 using System.Xml.Linq;
 using JackCompiler;
+using JackCompiler.Utilities;
+using JackCompiler.Utilities.ConstantsAndEnums;
 
 namespace JackCompilerTests;
 

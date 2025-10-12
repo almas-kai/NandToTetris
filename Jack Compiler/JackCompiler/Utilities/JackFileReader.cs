@@ -1,6 +1,7 @@
 using System.Collections;
+using JackCompiler.Utilities.ConstantsAndEnums;
 
-namespace JackCompiler;
+namespace JackCompiler.Utilities;
 
 internal class JackFileReader : IEnumerable<FileInfo>
 {

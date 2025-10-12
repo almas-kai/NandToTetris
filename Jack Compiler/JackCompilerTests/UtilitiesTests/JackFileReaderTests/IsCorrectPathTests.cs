@@ -1,4 +1,4 @@
-using JackCompiler;
+using JackCompiler.Utilities;
 
 namespace JackCompilerTests.UtilitiesTests.JackFileReaderTests;
 

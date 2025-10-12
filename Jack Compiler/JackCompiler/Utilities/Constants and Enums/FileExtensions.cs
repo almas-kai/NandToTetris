@@ -1,4 +1,4 @@
-namespace JackCompiler;
+namespace JackCompiler.Utilities.ConstantsAndEnums;
 
 internal static class FileExtensions
 {

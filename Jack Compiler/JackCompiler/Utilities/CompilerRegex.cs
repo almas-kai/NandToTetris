@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace JackCompiler;
+namespace JackCompiler.Utilities;
 
 internal static class CompilerRegex
 {

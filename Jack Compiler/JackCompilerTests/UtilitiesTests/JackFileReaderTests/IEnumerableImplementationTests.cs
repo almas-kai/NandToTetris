@@ -1,5 +1,6 @@
 using System.Collections;
-using JackCompiler;
+using JackCompiler.Utilities;
+using JackCompiler.Utilities.ConstantsAndEnums;
 
 namespace JackCompilerTests.UtilitiesTests.JackFileReaderTests;
 
