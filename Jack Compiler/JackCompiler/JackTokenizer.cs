@@ -222,6 +222,7 @@ internal class JackTokenizer
 		if (match is null)
 		{
 			match = CompilerRegex.IsSpace(instruction);
+			tokenValue = match.Success ? match.Value : string.Empty;
 		}
 
 		token = (tokenType, tokenValue);
