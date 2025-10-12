@@ -172,7 +172,7 @@ internal class JackTokenizer
 			throw new InvalidOperationException("Tokenizer error. Couldn't peek. Unrecognized token type.");
 		}
 	}
-
+	
 	private Match _MatchToken(string instruction, out (TokenType type, string value) token)
 	{
 		Match? match = null;
