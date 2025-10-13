@@ -67,7 +67,7 @@ public class IsKeywordTests
 		Match match = CompilerRegex.IsKeyword(correctKeyword);
 		string actual = match.Value;
 
-		Assert.AreEqual(expected, actual, $"Correct keyword should return itself as the match.");
+		Assert.AreEqual(expected, actual, $"Correct keyword's match should have 'Value' property equal to the matched keyword.");
 	}
 
 	[TestMethod()]
@@ -84,6 +84,6 @@ public class IsKeywordTests
 		Match match = CompilerRegex.IsKeyword(incorrectKeyword);
 		bool actual = match.Success;
 
-		Assert.AreEqual(expected, actual, "Incorrect keyword should return false.");
+		Assert.AreEqual(expected, actual, "Incorrect keyword should have unsuccessful match.");
 	}
 }
