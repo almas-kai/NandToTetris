@@ -19,7 +19,7 @@ internal class JackTokenizer
 
 			_instructionsQueue = new Queue<string>
 			(
-				CompilerRegex.ReplaceAllComments(rawInstructions, "")
+				CompilerRegex.RemoveAllComments(rawInstructions)
 					.Split("\n")
 					.Select(instruction => instruction.Trim())
 					.Where(instruction => instruction != string.Empty)

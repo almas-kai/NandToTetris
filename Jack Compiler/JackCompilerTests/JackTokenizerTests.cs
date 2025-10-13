@@ -27,7 +27,7 @@ public class JackTokenizerTests
         XDocument outputFile = XDocument.Load(outputFilePath);
         bool actual = XNode.DeepEquals(validFile, outputFile);
 
-        Assert.AreEqual(expected, actual);
+        Assert.AreEqual(expected, actual, "Generated tokenized output weren't equal to the expected one.");
     }
 
     [TestMethod()]
@@ -53,6 +53,6 @@ public class JackTokenizerTests
         }
         (TokenType type, string value) actual = jackTokenizer.Peek();
 
-        Assert.AreEqual(expected, actual);
+        Assert.AreEqual(expected, actual, "Peek method didn't work as expected.");
     }
 }

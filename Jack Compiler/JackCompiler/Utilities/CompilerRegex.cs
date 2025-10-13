@@ -11,9 +11,9 @@ internal static class CompilerRegex
 	private static readonly Regex _stringConstantRegex = new Regex(@"(""[^""]*"")", RegexOptions.Compiled);
 	private static readonly Regex _identifierRegex = new Regex(@"\b([_a-zA-Z]+[_a-zA-Z0-9]*)\b", RegexOptions.Compiled);
 	private static readonly Regex _spaceRegex = new Regex(@"\s", RegexOptions.Compiled);
-	public static string ReplaceAllComments(string instruction, string replacement)
+	public static string RemoveAllComments(string instruction)
 	{
-		return _commentsRegex.Replace(instruction, replacement);
+		return _commentsRegex.Replace(instruction, string.Empty);
 	}
 	public static Match IsKeyword(string instruction)
 	{
