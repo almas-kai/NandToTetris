@@ -23,22 +23,18 @@ internal static class CompilerRegex
 	{
 		return _symbolRegex.Match(instruction);
 	}
-
 	public static Match IsIntegerConstant(string instruction)
 	{
 		return _integerConstantRegex.Match(instruction);
 	}
-
 	public static Match IsStringConstant(string instruction)
 	{
 		return _stringConstantRegex.Match(instruction);
 	}
-
 	public static Match IsIdentifier(string instruction)
 	{
 		return _identifierRegex.Match(instruction);
 	}
-
 	public static Match IsSpace(string instruction)
 	{
 		return _spaceRegex.Match(instruction);

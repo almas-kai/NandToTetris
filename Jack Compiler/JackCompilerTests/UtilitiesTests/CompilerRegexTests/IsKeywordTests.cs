@@ -28,7 +28,7 @@ public class IsKeywordTests
 	[DataRow("else")]
 	[DataRow("while")]
 	[DataRow("return")]
-	public void PassingCorrectKeyword_ReturnsMatchSuccess(string correctKeyword)
+	public void PassingCorrectKeyword_MatchSuccessIsTrue(string correctKeyword)
 	{
 		bool expected = true;
 
@@ -60,7 +60,7 @@ public class IsKeywordTests
 	[DataRow("else")]
 	[DataRow("while")]
 	[DataRow("return")]
-	public void PassingCorrectKeyword_ReturnsCorrectMatchValue(string correctKeyword)
+	public void PassingCorrectKeyword_MatchValueEqualsToThePassedKeyword(string correctKeyword)
 	{
 		string expected = correctKeyword;
 
@@ -77,7 +77,7 @@ public class IsKeywordTests
 	[DataRow("functionCustom")]
 	[DataRow("false_01")]
 	[DataRow("Constructor")]
-	public void PassingIncorrectKeyword_ReturnsFalse(string incorrectKeyword)
+	public void PassingIncorrectKeyword_MatchSuccessIsFalse(string incorrectKeyword)
 	{
 		bool expected = false;
 

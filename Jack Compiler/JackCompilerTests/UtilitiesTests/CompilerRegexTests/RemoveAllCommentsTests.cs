@@ -103,7 +103,7 @@ public class RemoveAllComments
 			}
 		"""
 	)]
-	public void PassingCodeWithoutComments_ReturnsJustCopy(string withoutComments)
+	public void PassingCodeWithoutComments_ReturnsOriginalString(string withoutComments)
 	{
 		string actual = CompilerRegex.RemoveAllComments(withoutComments);
 
