@@ -183,7 +183,7 @@ internal class JackTokenizer
 		Func<string, Match>[] tokenTypeMatchers = new Func<string, Match>[] {
 			CompilerRegex.IsKeyword,
 			CompilerRegex.IsSymbol,
-			CompilerRegex.IsPositiveIntegerConstant,
+			CompilerRegex.IsIntegerConstant,
 			CompilerRegex.IsStringConstant,
 			CompilerRegex.IsIdentifier
 		};
