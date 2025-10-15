@@ -9,7 +9,7 @@ internal static class CompilerRegex
 	private static readonly Regex _symbolRegex = new Regex(@"[{}()\[\].,;+\-*/&|<>=~]", RegexOptions.Compiled);
 	private static readonly Regex _integerConstantRegex = new Regex(@"\b\d+\b", RegexOptions.Compiled);
 	private static readonly Regex _stringConstantRegex = new Regex(@"(""[^""]*"")", RegexOptions.Compiled);
-	private static readonly Regex _identifierRegex = new Regex(@"\b([_a-zA-Z]+[_a-zA-Z0-9]*)\b", RegexOptions.Compiled);
+	private static readonly Regex _identifierRegex = new Regex(@"^\b([_a-zA-Z]+[_a-zA-Z0-9]*)\b", RegexOptions.Compiled);
 	private static readonly Regex _spaceRegex = new Regex(@"\s", RegexOptions.Compiled);
 	public static string RemoveAllComments(string instruction)
 	{
