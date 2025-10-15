@@ -714,7 +714,7 @@ internal class CompilationEngine : IDisposable
 			switch (tokenType)
 			{
 				case TokenType.INT_CONST:
-					int intConst = _jackTokenizer.GetPositiveInteger();
+					int intConst = _jackTokenizer.GetUInt15Constant();
 					_Write($"<integerConstant> {intConst} </integerConstant>");
 					isDone = true;
 					break;

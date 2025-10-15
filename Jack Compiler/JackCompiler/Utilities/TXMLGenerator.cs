@@ -35,7 +35,7 @@ internal static class TXMLGenerator
 						writer.WriteLine($"<identifier> {identifier} </identifier>");
 						break;
 					case TokenType.INT_CONST:
-						int intConstant = jackTokenizer.GetPositiveInteger();
+						int intConstant = jackTokenizer.GetUInt15Constant();
 						writer.WriteLine($"<integerConstant> {intConstant} </integerConstant>");
 						break;
 					case TokenType.STRING_CONST:

@@ -107,7 +107,7 @@ internal class JackTokenizer
 
 		return CurrentToken.Value;
 	}
-	public int GetPositiveInteger()
+	public int GetUInt15Constant()
 	{
 		if (CurrentToken.Type is not TokenType.INT_CONST)
 		{
