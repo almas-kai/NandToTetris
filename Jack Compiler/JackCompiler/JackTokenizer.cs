@@ -43,7 +43,7 @@ internal class JackTokenizer
 		if (tokenMatch.Success)
 		{
 			_currentInstruction = _currentInstruction.Remove(0, tokenMatch.Value.Length);
-			if (tokenMatch.Value == " ")
+			if (token.type == TokenType.SPACE)
 			{
 				goto SpaceLabel;
 			}
@@ -160,7 +160,7 @@ internal class JackTokenizer
 		{
 			currentInstruction = currentInstruction.Remove(0, peekMatch.Value.Length);
 
-			if (peekMatch.Value == " ")
+			if (token.type == TokenType.SPACE)
 			{
 				goto peekLabel;
 			}
@@ -225,6 +225,7 @@ internal class JackTokenizer
 		{
 			match = CompilerRegex.IsSpace(instruction);
 			tokenValue = match.Success ? match.Value : string.Empty;
+			tokenType = TokenType.SPACE;
 		}
 
 		token = (tokenType, tokenValue);

@@ -7,5 +7,6 @@ internal enum TokenType
 	SYMBOL,
 	IDENTIFIER,
 	INT_CONST,
-	STRING_CONST
+	STRING_CONST,
+	SPACE
 }
