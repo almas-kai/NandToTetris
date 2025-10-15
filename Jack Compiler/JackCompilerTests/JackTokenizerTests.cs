@@ -20,7 +20,9 @@ public class JackTokenizerTests
     {
         bool expected = true;
         FileInfo inputFile = new FileInfo(inputPath);
-        string outputFilePath = inputPath.Replace(FileExtensions.JACK_EXTENSION, FileExtensions.TOKENIZED_OUTPUT);
+        string outputFilePath = inputPath.Replace(
+            FileExtensions.JACK_EXTENSION,
+            FileExtensions.TOKENIZED_OUTPUT + FileExtensions.XML_EXTENSION);
         TXMLGenerator.GenerateTestingXMLFile(inputFile, outputFilePath);
         
         XDocument validFile = XDocument.Load(validFilePath);
