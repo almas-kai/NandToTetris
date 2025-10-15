@@ -107,7 +107,7 @@ internal class JackTokenizer
 
 		return CurrentToken.Value;
 	}
-	public int GetInteger()
+	public int GetPositiveInteger()
 	{
 		if (CurrentToken.Type is not TokenType.INT_CONST)
 		{
@@ -183,7 +183,7 @@ internal class JackTokenizer
 		Func<string, Match>[] tokenTypeMatchers = new Func<string, Match>[] {
 			CompilerRegex.IsKeyword,
 			CompilerRegex.IsSymbol,
-			CompilerRegex.IsIntegerConstant,
+			CompilerRegex.IsPositiveIntegerConstant,
 			CompilerRegex.IsStringConstant,
 			CompilerRegex.IsIdentifier
 		};

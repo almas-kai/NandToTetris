@@ -23,7 +23,7 @@ internal static class CompilerRegex
 	{
 		return _symbolRegex.Match(instruction);
 	}
-	public static Match IsIntegerConstant(string instruction)
+	public static Match IsPositiveIntegerConstant(string instruction)
 	{
 		return _integerConstantRegex.Match(instruction);
 	}
