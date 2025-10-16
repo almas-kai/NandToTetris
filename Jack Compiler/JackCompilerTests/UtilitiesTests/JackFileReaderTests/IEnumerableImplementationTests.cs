@@ -60,7 +60,7 @@ public class IEnumerableImplementationTests
 		CollectionAssert.AreEqual(
 			jackFilePaths,
 			actualFilePaths,
-			"Enumeration doesn't work as expected."
+			"Enumeration did't work as expected."
 		);
 	}
 }
