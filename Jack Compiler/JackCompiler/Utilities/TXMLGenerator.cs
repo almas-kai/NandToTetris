@@ -24,7 +24,7 @@ internal static class TXMLGenerator
 				{
 					case TokenType.KEYWORD:
 						Keyword keyword = jackTokenizer.GetKeyword();
-						writer.WriteLine($"<keyword> {KeywordToString.ConvertToLower(keyword)} </keyword>");
+						writer.WriteLine($"<keyword> {EnumToString<Keyword>.ConvertToLower(keyword)} </keyword>");
 						break;
 					case TokenType.SYMBOL:
 						string symbol = jackTokenizer.GetSymbol();

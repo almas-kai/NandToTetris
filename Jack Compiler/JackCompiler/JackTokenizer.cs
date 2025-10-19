@@ -8,7 +8,7 @@ internal class JackTokenizer
 {
 	private Queue<string> _instructionsQueue;
 	private string _currentInstruction = string.Empty;
-	public (TokenType Type, string Value) CurrentToken { get; private set; }
+	public (TokenType Type, string RawValue) CurrentToken { get; private set; }
 	public bool HasMoreTokens => _instructionsQueue.Count > 0 || _currentInstruction != string.Empty;
 
 	public JackTokenizer(FileInfo fileInfo)
@@ -54,7 +54,7 @@ internal class JackTokenizer
 		}
 		else
 		{
-			throw new InvalidOperationException("Tokenizer error - Advance method error. Couldn't match the token. Unrecognized token type.");
+			throw new InvalidOperationException($"Tokenizer error - Advance method error. Couldn't match the token. Unrecognized token type. Token type is: \"{token.type}\", token value is: \"{token.value}\".");
 		}
 	}
 	public Keyword GetKeyword()
@@ -65,26 +65,26 @@ internal class JackTokenizer
 		}
 
 		bool isValidKeyword = Enum.TryParse<Keyword>(
-			value: CurrentToken.Value,
+			value: CurrentToken.RawValue,
 			ignoreCase: true,
 			result: out Keyword keyword
 		);
 
 		if (!isValidKeyword)
 		{
-			throw new InvalidOperationException($"Tokenizer error. Unrecognized keyword: \"{CurrentToken.Value}\".");
+			throw new InvalidOperationException($"Tokenizer error. Unrecognized keyword: \"{CurrentToken.RawValue}\".");
 		}
 
 		return keyword;
 	}
 	public string GetSymbol()
 	{
-		if (CurrentToken.Type is not TokenType.SYMBOL || CurrentToken.Value.Length != 1)
+		if (CurrentToken.Type is not TokenType.SYMBOL || CurrentToken.RawValue.Length != 1)
 		{
-			throw new InvalidOperationException($"Tokenizer error. Cannot get the symbol. Because token type is not symbol or the parsing instruction value is incorrect. The token type is \"{CurrentToken.Type}\", and token value is \"{CurrentToken.Value}\".");
+			throw new InvalidOperationException($"Tokenizer error. Cannot get the symbol. Because token type is not symbol or the parsing instruction value is incorrect. The token type is \"{CurrentToken.Type}\", and token value is \"{CurrentToken.RawValue}\".");
 		}
 
-		switch (CurrentToken.Value)
+		switch (CurrentToken.RawValue)
 		{
 			case "<":
 				return "&lt;";
@@ -95,7 +95,7 @@ internal class JackTokenizer
 			case "\"":
 				return "&quot;";
 			default:
-				return CurrentToken.Value;
+				return CurrentToken.RawValue;
 		}
 	}
 	public string GetIdentifier()
@@ -105,7 +105,7 @@ internal class JackTokenizer
 			throw new InvalidOperationException($"Tokenizer error. Cannot get the identifier. Because token type is not identifier. The token type is \"{CurrentToken.Type}\".");
 		}
 
-		return CurrentToken.Value;
+		return CurrentToken.RawValue;
 	}
 	public int GetUInt15Constant()
 	{
@@ -114,7 +114,7 @@ internal class JackTokenizer
 			throw new InvalidOperationException($"Tokenizer error. Cannot get the integer constant. Because token type is not integer constant. The token type is \"{CurrentToken.Type}\".");
 		}
 
-		if (int.TryParse(CurrentToken.Value, out int intConst))
+		if (int.TryParse(CurrentToken.RawValue, out int intConst))
 		{
 			if (intConst >= 0 && intConst <= 32767)
 			{
@@ -127,7 +127,7 @@ internal class JackTokenizer
 		}
 		else
 		{
-			throw new InvalidOperationException($"Tokenizer error. Cannot get the integer constant. Because it is not an integer constant. It is: \"{CurrentToken.Value}\".");
+			throw new InvalidOperationException($"Tokenizer error. Cannot get the integer constant. Because it is not an integer constant. It is: \"{CurrentToken.RawValue}\".");
 		}
 	}
 	public string GetString()
@@ -137,7 +137,7 @@ internal class JackTokenizer
 			throw new InvalidOperationException($"Tokenizer error. Cannot get the string constant. Because token type is not a string constant. The token type is: \"{CurrentToken.Type}\".");
 		}
 
-		return CurrentToken.Value;
+		return CurrentToken.RawValue;
 	}
 	public (TokenType type, string value) Peek()
 	{
@@ -225,7 +225,7 @@ internal class JackTokenizer
 		{
 			match = CompilerRegex.IsSpace(instruction);
 			tokenValue = match.Success ? match.Value : string.Empty;
-			tokenType = TokenType.SPACE;
+			tokenType = match.Success ? TokenType.SPACE : TokenType.UNKNOWN;
 		}
 
 		token = (tokenType, tokenValue);
