@@ -1,4 +1,5 @@
 using System.Xml.Linq;
+
 using JackCompiler;
 using JackCompiler.Utilities;
 using JackCompiler.Utilities.ConstantsAndEnums;
@@ -24,7 +25,7 @@ public class JackTokenizerTests
             FileExtensions.JACK_EXTENSION,
             FileExtensions.TOKENIZED_OUTPUT + FileExtensions.XML_EXTENSION);
         TXMLGenerator.GenerateTestingXMLFile(inputFile, outputFilePath);
-        
+
         XDocument validFile = XDocument.Load(validFilePath);
         XDocument outputFile = XDocument.Load(outputFilePath);
         bool actual = XNode.DeepEquals(validFile, outputFile);

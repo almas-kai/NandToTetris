@@ -1,0 +1,4 @@
+class SimpleClass {
+  static int a, b, c;
+  field boolean isSum;
+}

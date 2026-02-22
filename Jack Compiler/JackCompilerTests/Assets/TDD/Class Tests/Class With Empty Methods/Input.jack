@@ -1,0 +1,8 @@
+class SimpleClass {
+  static int a, b, c;
+  field boolean isSum;
+
+  constructor SimpleClass new() {}
+  function void test() {}
+  method void test2(int x, int y) {}
+}

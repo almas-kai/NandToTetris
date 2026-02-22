@@ -1,0 +1,64 @@
+<class>
+  <keyword> class </keyword>
+  <identifier> SimpleClass </identifier>
+  <symbol> { </symbol>
+    <classVarDec>
+      <keyword> static </keyword>
+      <keyword> int </keyword>
+      <identifier> a </identifier>
+      <symbol> , </symbol>
+      <identifier> b </identifier>
+      <symbol> , </symbol>
+      <identifier> c </identifier>
+      <symbol> ; </symbol>
+    </classVarDec>
+    <classVarDec>
+      <keyword> field </keyword>
+      <keyword> boolean </keyword>
+      <identifier> isSum </identifier>
+      <symbol> ; </symbol>
+    </classVarDec>
+    <subroutineDec>
+      <keyword> constructor </keyword>
+      <identifier> SimpleClass </identifier>
+      <identifier> new </identifier>
+      <symbol> ( </symbol>
+      <parameterList></parameterList>
+      <symbol> ) </symbol>
+      <subroutineBody>
+        <symbol> { </symbol>
+        <symbol> } </symbol>
+      </subroutineBody>
+    </subroutineDec>
+    <subroutineDec>
+      <keyword> function </keyword>
+      <keyword> void </keyword>
+      <identifier> test </identifier>
+      <symbol> ( </symbol>
+      <parameterList></parameterList>
+      <symbol> ) </symbol>
+      <subroutineBody>
+        <symbol> { </symbol>
+        <symbol> } </symbol>
+      </subroutineBody>
+    </subroutineDec>
+    <subroutineDec>
+      <keyword> method </keyword>
+      <keyword> void </keyword>
+      <identifier> test2 </identifier>
+      <symbol> ( </symbol>
+      <parameterList>
+        <keyword> int </keyword>
+        <identifier> x </identifier>
+        <symbol> , </symbol>
+        <keyword> int </keyword>
+        <identifier> y </identifier>
+      </parameterList>
+      <symbol> ) </symbol>
+      <subroutineBody>
+        <symbol> { </symbol>
+        <symbol> } </symbol>
+      </subroutineBody>
+    </subroutineDec>
+  <symbol> } </symbol>
+</class>

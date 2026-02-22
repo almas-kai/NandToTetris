@@ -1,0 +1,7 @@
+class SimpleClass {
+  method void test2(int x, int y) {
+    let s = "string constant";
+    let num = 12;
+    let exit = true;
+  }
+}

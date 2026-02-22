@@ -1,0 +1,6 @@
+class SimpleClass {
+  method void test2(int x, int y) {
+    var int myVar;
+    var char myChar1, myChar2;
+  }
+}

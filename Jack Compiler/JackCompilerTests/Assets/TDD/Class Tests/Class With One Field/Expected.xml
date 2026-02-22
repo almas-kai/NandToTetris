@@ -1,0 +1,12 @@
+<class>
+  <keyword> class </keyword>
+  <identifier> SimpleClass </identifier>
+  <symbol> { </symbol>
+    <classVarDec>
+      <keyword> static </keyword>
+      <keyword> int </keyword>
+      <identifier> a </identifier>
+      <symbol> ; </symbol>
+    </classVarDec>
+  <symbol> } </symbol>
+</class>
