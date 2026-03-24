@@ -1,0 +1,74 @@
+<class>
+  <keyword> class </keyword>
+  <identifier> SimpleClass </identifier>
+  <symbol> { </symbol>
+    <subroutineDec>
+      <keyword> method </keyword>
+      <keyword> void </keyword>
+      <identifier> test2 </identifier>
+      <symbol> ( </symbol>
+      <parameterList>
+        <keyword> int </keyword>
+        <identifier> x </identifier>
+        <symbol> , </symbol>
+        <keyword> int </keyword>
+        <identifier> y </identifier>
+      </parameterList>
+      <symbol> ) </symbol>
+      <subroutineBody>
+        <symbol> { </symbol>
+          <statements>
+
+            <letStatement>
+              <keyword> let </keyword>
+              <identifier> exit </identifier>
+              <symbol> = </symbol>
+              <expression>
+                <term>
+                  <keyword> true </keyword>
+                </term>
+              </expression>
+              <symbol> ; </symbol>
+            </letStatement>
+
+            <ifStatement>
+              <keyword> if </keyword>
+              <symbol> ( </symbol>
+                <expression>
+                  <term>
+                    <identifier> exit </identifier>
+                  </term>
+                </expression>
+              <symbol> ) </symbol>
+              <symbol> { </symbol>
+                <statements>
+                </statements>
+              <symbol> } </symbol>
+            </ifStatement>
+
+            <ifStatement>
+              <keyword> if </keyword>
+              <symbol> ( </symbol>
+                <expression>
+                  <term>
+                    <identifier> exit </identifier>
+                  </term>
+                </expression>
+              <symbol> ) </symbol>
+              <symbol> { </symbol>
+                <statements>
+                </statements>
+              <symbol> } </symbol>
+              <keyword> else </keyword>
+              <symbol> { </symbol>
+                <statements>
+                </statements>
+              <symbol> } </symbol>
+            </ifStatement>
+
+          </statements>
+        <symbol> } </symbol>
+      </subroutineBody>
+    </subroutineDec>
+  <symbol> } </symbol>
+</class>

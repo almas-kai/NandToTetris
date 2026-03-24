@@ -1,0 +1,35 @@
+<class>
+  <keyword> class </keyword>
+  <identifier> SimpleClass </identifier>
+  <symbol> { </symbol>
+    <subroutineDec>
+      <keyword> method </keyword>
+      <keyword> void </keyword>
+      <identifier> simpleWhileLoop </identifier>
+      <symbol> ( </symbol>
+      <parameterList>
+      </parameterList>
+      <symbol> ) </symbol>
+      <subroutineBody>
+        <symbol> { </symbol>
+          <statements>
+            <whileStatement>
+              <keyword> while </keyword>
+              <symbol> ( </symbol>
+                <expression>
+                  <term>
+                    <keyword> true </keyword>
+                  </term>
+                </expression>
+              <symbol> ) </symbol>
+              <symbol> { </symbol>
+                <statements>
+                </statements>
+              <symbol> } </symbol>
+            </whileStatement>
+          </statements>
+        <symbol> } </symbol>
+      </subroutineBody>
+    </subroutineDec>
+  <symbol> } </symbol>
+</class>

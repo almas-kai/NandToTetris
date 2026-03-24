@@ -1,0 +1,5 @@
+class SimpleClass {
+  method void simpleWhileLoop() {
+    while(true) {}
+  }
+}

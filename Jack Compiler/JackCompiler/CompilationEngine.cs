@@ -570,15 +570,352 @@ internal class CompilationEngine : IDisposable
     }
     private void CompileIf()
     {
+        Write("<ifStatement>");
+
+        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
+
+        if(token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.IF)
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.IF}\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
+            EnumToString<Keyword>.ConvertToLower(Keyword.IF)
+        );
+
+        _jackTokenizer.Advance();
+
+        token = _jackTokenizer.CurrentToken;
+
+        if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "(")
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"(\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            _jackTokenizer.GetSymbol()
+        );
+
+        _jackTokenizer.Advance();
+
+        CompileExpression();
+
+        token = _jackTokenizer.CurrentToken;
+
+        if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ")")
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \")\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            _jackTokenizer.GetSymbol()
+        );
+
+        _jackTokenizer.Advance();
+
+        if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"{{\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            _jackTokenizer.GetSymbol()
+        );
+
+        _jackTokenizer.Advance();
+
+        CompileStatements();
+
+        token = _jackTokenizer.CurrentToken;
+
+        if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"}}\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            _jackTokenizer.GetSymbol()
+        );
+
+        _jackTokenizer.Advance();
+
+        token = _jackTokenizer.CurrentToken;
+
+        if (token.type is TokenType.KEYWORD && _jackTokenizer.GetKeyword() is Keyword.ELSE)
+        {
+            WriteNode(
+                EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
+                EnumToString<Keyword>.ConvertToLower(Keyword.ELSE)
+            );
+
+            _jackTokenizer.Advance();
+
+            token = _jackTokenizer.CurrentToken;
+
+            if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
+            {
+                throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"{{\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+            }
+
+            WriteNode(
+                EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                _jackTokenizer.GetSymbol()
+            );
+
+            _jackTokenizer.Advance();
+
+            CompileStatements();
+
+            token = _jackTokenizer.CurrentToken;
+
+            if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
+            {
+                throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"}}\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+            }
+
+            WriteNode(
+                EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                _jackTokenizer.GetSymbol()
+            );
+
+            _jackTokenizer.Advance();
+        }
+
+        Write("</ifStatement>");
     }
     private void CompileWhile()
     {
+        Write("<whileStatement>");
+
+        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
+
+        if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.WHILE)
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.WHILE}\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
+            EnumToString<Keyword>.ConvertToLower(Keyword.WHILE)
+        );
+
+        _jackTokenizer.Advance();
+
+        token = _jackTokenizer.CurrentToken;
+
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "(")
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"(\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            _jackTokenizer.GetSymbol()
+        );
+
+        _jackTokenizer.Advance();
+
+        CompileExpression();
+
+        token = _jackTokenizer.CurrentToken;
+
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ")")
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \")\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            _jackTokenizer.GetSymbol()
+        );
+
+        _jackTokenizer.Advance();
+
+        token = _jackTokenizer.CurrentToken;
+
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"{{\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            _jackTokenizer.GetSymbol()
+        );
+
+        _jackTokenizer.Advance();
+
+        CompileStatements();
+
+        token = _jackTokenizer.CurrentToken;
+
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"}}\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            _jackTokenizer.GetSymbol()
+        );
+
+        _jackTokenizer.Advance();
+
+        Write("</whileStatement>");
     }
     private void CompileDo()
     {
+        Write("<doStatement>");
+
+        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
+
+        if (token.type is not TokenType.KEYWORD)
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.DO}\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
+            EnumToString<Keyword>.ConvertToLower(_jackTokenizer.GetKeyword())
+        );
+
+        _jackTokenizer.Advance();
+
+        token = _jackTokenizer.CurrentToken;
+
+        if (token.type is not TokenType.IDENTIFIER)
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.IDENTIFIER}\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
+            _jackTokenizer.GetIdentifier()
+        );
+
+        _jackTokenizer.Advance();
+
+        token = _jackTokenizer.CurrentToken;
+
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ("." or "("))
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \".\" or \"(\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+        }
+
+        if (_jackTokenizer.GetSymbol() is ".")
+        {
+            WriteNode(
+                EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                _jackTokenizer.GetSymbol()
+            );
+
+            _jackTokenizer.Advance();
+
+            token = _jackTokenizer.CurrentToken;
+
+            if (token.type is not TokenType.IDENTIFIER)
+            {
+                throw new FormatException($"Expected token type of \"{TokenType.IDENTIFIER}\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            }
+
+            WriteNode(
+                EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
+                _jackTokenizer.GetIdentifier()
+            );
+
+            _jackTokenizer.Advance();
+
+            token = _jackTokenizer.CurrentToken;
+        }
+
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "(")
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"(\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            _jackTokenizer.GetSymbol()
+        );
+
+        _jackTokenizer.Advance();
+
+        CompileExpressionList();
+
+        token = _jackTokenizer.CurrentToken;
+
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ")")
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \")\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            _jackTokenizer.GetSymbol()
+        );
+
+        _jackTokenizer.Advance();
+
+        token = _jackTokenizer.CurrentToken;
+
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \";\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            _jackTokenizer.GetSymbol()
+        );
+
+        _jackTokenizer.Advance();
+
+        Write("</doStatement>");
     }
     private void CompileReturn()
     {
+        Write("<returnStatement>");
+
+        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
+
+        if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.RETURN)
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.RETURN}\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
+            EnumToString<Keyword>.ConvertToLower(Keyword.RETURN)
+        );
+
+        _jackTokenizer.Advance();
+
+        token = _jackTokenizer.CurrentToken;
+
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
+        {
+            CompileExpression();
+            token = _jackTokenizer.CurrentToken;
+        }
+
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
+        {
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \";\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+        }
+
+        WriteNode(
+            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            _jackTokenizer.GetSymbol()
+        );
+
+        _jackTokenizer.Advance();
+
+        Write("</returnStatement>");
     }
     private void CompileExpression()
     {
@@ -770,7 +1107,31 @@ internal class CompilationEngine : IDisposable
     }
     private int CompileExpressionList()
     {
-        throw new NotImplementedException();
+        int count = 0;
+        Write("<expressionList>");
+
+        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
+        while(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ")")
+        {
+            count ++;
+            CompileExpression();
+
+            token = _jackTokenizer.CurrentToken;
+            if (token.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
+            {
+                WriteNode(
+                    EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                    _jackTokenizer.GetSymbol()
+                );
+
+                _jackTokenizer.Advance();
+
+                token = _jackTokenizer.CurrentToken;
+            }
+        }
+
+        Write("</expressionList>");
+        return count;
     }
     private void Write(string message)
     {

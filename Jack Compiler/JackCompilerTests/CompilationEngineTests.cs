@@ -34,6 +34,10 @@ public class CompilationEngineTests
     [DataRow("./Assets/TDD/Class Tests/Class With Empty Methods/Input.jack", "./Assets/TDD/Class Tests/Class With Empty Methods/Expected.xml")]
     [DataRow("./Assets/TDD/Class Tests/Class With Methods That Contain Vars/Input.jack", "./Assets/TDD/Class Tests/Class With Methods That Contain Vars/Expected.xml")]
     [DataRow("./Assets/TDD/Class Tests/Class With Let Statements/Input.jack", "./Assets/TDD/Class Tests/Class With Let Statements/Expected.xml")]
+    [DataRow("./Assets/TDD/Class Tests/Class With Simple Conditionals/Input.jack", "./Assets/TDD/Class Tests/Class With Simple Conditionals/Expected.xml")]
+    [DataRow("./Assets/TDD/Class Tests/Class With Simple While Loop/Input.jack", "./Assets/TDD/Class Tests/Class With Simple While Loop/Expected.xml")]
+    [DataRow("./Assets/TDD/Class Tests/Class With Simple Do Instruction/Input.jack", "./Assets/TDD/Class Tests/Class With Simple Do Instruction/Expected.xml")]
+    [DataRow("./Assets/TDD/Class Tests/Class With Simple Return/Input.jack", "./Assets/TDD/Class Tests/Class With Simple Return/Expected.xml")]
     public void InitializeInstance_PassingCorrectInput_GeneratesCorrectOutput(string inputFilePath, string expectedFilePath)
     {
         bool expected = true;

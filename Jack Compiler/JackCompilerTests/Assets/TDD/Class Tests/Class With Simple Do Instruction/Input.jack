@@ -1,0 +1,5 @@
+class SimpleClass {
+  method void simpleMethod() {
+    do Memory.deAlloc(this);
+  }
+}

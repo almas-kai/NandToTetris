@@ -1,0 +1,9 @@
+class SimpleClass {
+  method void test2(int x, int y) {
+    let exit = true;
+    if (exit) {}
+
+    if (exit) {}
+    else {}
+  }
+}
