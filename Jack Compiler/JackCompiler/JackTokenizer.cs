@@ -31,7 +31,7 @@ internal class JackTokenizer
     {
         if (HasMoreTokens is false)
         {
-            throw new InvalidOperationException("Tokenizer error - Advance method error. Cannot advance. There are no more instructions.");
+            throw new InvalidOperationException("Cannot advance. There are no more instructions.");
         }
 
     SpaceLabel:
@@ -41,7 +41,7 @@ internal class JackTokenizer
         }
         Match tokenMatch = _MatchToken(_currentInstruction, out (TokenType type, string value) token);
 
-        if (tokenMatch.Success)
+        if (tokenMatch.Success && token.type is not TokenType.UNKNOWN)
         {
             _currentInstruction = _currentInstruction.Remove(0, tokenMatch.Value.Length);
             if (token.type == TokenType.SPACE)
@@ -55,14 +55,14 @@ internal class JackTokenizer
         }
         else
         {
-            throw new InvalidOperationException($"Tokenizer error - Advance method error. Couldn't match the token. Unrecognized token type. Token type is: \"{token.type}\", token value is: \"{token.value}\".");
+            throw new InvalidOperationException($"Couldn't match the token. Unrecognized token type. Token type is: \"{token.type}\", token value is: \"{token.value}\".");
         }
     }
     public Keyword GetKeyword()
     {
         if (CurrentToken.Type is not TokenType.KEYWORD)
         {
-            throw new InvalidOperationException($"Tokenizer error. Cannot get the keyword. Because token type is not keyword. The token type is \"{CurrentToken.Type}\".");
+            throw new InvalidOperationException($"Cannot get the keyword, token type is not keyword. The token type is \"{CurrentToken.Type}\".");
         }
 
         bool isValidKeyword = Enum.TryParse<Keyword>(
@@ -73,7 +73,7 @@ internal class JackTokenizer
 
         if (!isValidKeyword)
         {
-            throw new InvalidOperationException($"Tokenizer error. Unrecognized keyword: \"{CurrentToken.RawValue}\".");
+            throw new InvalidOperationException($"Unrecognized keyword: \"{CurrentToken.RawValue}\".");
         }
 
         return keyword;
@@ -82,7 +82,7 @@ internal class JackTokenizer
     {
         if (CurrentToken.Type is not TokenType.SYMBOL || CurrentToken.RawValue.Length != 1)
         {
-            throw new InvalidOperationException($"Tokenizer error. Cannot get the symbol. Because token type is not symbol or the parsing instruction value is incorrect. The token type is \"{CurrentToken.Type}\", and token value is \"{CurrentToken.RawValue}\".");
+            throw new InvalidOperationException($"Cannot get the symbol, token type is not symbol or the parsing instruction value is incorrect. The token type is \"{CurrentToken.Type}\", and token value is \"{CurrentToken.RawValue}\".");
         }
 
         switch (CurrentToken.RawValue)
@@ -103,7 +103,7 @@ internal class JackTokenizer
     {
         if (CurrentToken.Type is not TokenType.IDENTIFIER)
         {
-            throw new InvalidOperationException($"Tokenizer error. Cannot get the identifier. Because token type is not identifier. The token type is \"{CurrentToken.Type}\".");
+            throw new InvalidOperationException($"Cannot get the identifier, token type is not identifier. The token type is \"{CurrentToken.Type}\".");
         }
 
         return CurrentToken.RawValue;
@@ -112,7 +112,7 @@ internal class JackTokenizer
     {
         if (CurrentToken.Type is not TokenType.INT_CONST)
         {
-            throw new InvalidOperationException($"Tokenizer error. Cannot get the integer constant. Because token type is not integer constant. The token type is \"{CurrentToken.Type}\".");
+            throw new InvalidOperationException($"Cannot get the integer constant, token type is not integer constant. The token type is \"{CurrentToken.Type}\".");
         }
 
         if (int.TryParse(CurrentToken.RawValue, out int intConst))
@@ -123,19 +123,19 @@ internal class JackTokenizer
             }
             else
             {
-                throw new InvalidOperationException($"Tokenizer error. Cannot get the integer constant. Because it has to be 0 <= x <= 32767. But it was: \"{intConst}\".");
+                throw new InvalidOperationException($"Cannot get the integer constant, it has to be 0 <= x <= 32767. But it was: \"{intConst}\".");
             }
         }
         else
         {
-            throw new InvalidOperationException($"Tokenizer error. Cannot get the integer constant. Because it is not an integer constant. It is: \"{CurrentToken.RawValue}\".");
+            throw new InvalidOperationException($"Cannot get the integer constant, it is not an integer constant. It is: \"{CurrentToken.RawValue}\".");
         }
     }
     public string GetString()
     {
         if (CurrentToken.Type is not TokenType.STRING_CONST)
         {
-            throw new InvalidOperationException($"Tokenizer error. Cannot get the string constant. Because token type is not a string constant. The token type is: \"{CurrentToken.Type}\".");
+            throw new InvalidOperationException($"Cannot get the string constant, token type is not a string constant. The token type is: \"{CurrentToken.Type}\".");
         }
 
         return CurrentToken.RawValue;
@@ -157,7 +157,7 @@ internal class JackTokenizer
 
         Match peekMatch = _MatchToken(currentInstruction, out (TokenType type, string value) token);
 
-        if (peekMatch.Success)
+        if (peekMatch.Success && token.type is not TokenType.UNKNOWN)
         {
             currentInstruction = currentInstruction.Remove(0, peekMatch.Value.Length);
 
@@ -172,7 +172,7 @@ internal class JackTokenizer
         }
         else
         {
-            throw new InvalidOperationException("Tokenizer error. Couldn't peek. Unrecognized token type.");
+            throw new InvalidOperationException($"Couldn't peek. Unrecognized token type. Token type is \"{token.type}\", and token value is \"{token.value}\".");
         }
     }
 
@@ -181,13 +181,13 @@ internal class JackTokenizer
         Match? match = null;
         string tokenValue = string.Empty;
         TokenType tokenType = TokenType.UNKNOWN;
-        Func<string, Match>[] tokenTypeMatchers = new Func<string, Match>[] {
-      CompilerRegex.IsKeyword,
-      CompilerRegex.IsSymbol,
-      CompilerRegex.IsIntegerConstant,
-      CompilerRegex.IsStringConstant,
-      CompilerRegex.IsIdentifier
-    };
+        Func<string, Match>[] tokenTypeMatchers = {
+            CompilerRegex.IsKeyword,
+            CompilerRegex.IsSymbol,
+            CompilerRegex.IsIntegerConstant,
+            CompilerRegex.IsStringConstant,
+            CompilerRegex.IsIdentifier
+        };
 
         for (int i = 0; i < tokenTypeMatchers.Length; i++)
         {
@@ -216,7 +216,7 @@ internal class JackTokenizer
                         tokenType = TokenType.IDENTIFIER;
                         break;
                     default:
-                        throw new InvalidOperationException("Tokenizer error. Error in _MatchToken. Unrecognized token type.");
+                        throw new InvalidOperationException("Unrecognized token type.");
                 }
                 break;
             }
