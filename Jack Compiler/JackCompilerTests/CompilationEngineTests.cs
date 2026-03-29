@@ -38,6 +38,13 @@ public class CompilationEngineTests
     [DataRow("./Assets/TDD/Class Tests/Class With Simple While Loop/Input.jack", "./Assets/TDD/Class Tests/Class With Simple While Loop/Expected.xml")]
     [DataRow("./Assets/TDD/Class Tests/Class With Simple Do Instruction/Input.jack", "./Assets/TDD/Class Tests/Class With Simple Do Instruction/Expected.xml")]
     [DataRow("./Assets/TDD/Class Tests/Class With Simple Return/Input.jack", "./Assets/TDD/Class Tests/Class With Simple Return/Expected.xml")]
+    [DataRow("./Assets/ArrayTestFiles/Main.jack", "./Assets/ArrayTestFiles/ValidOutput/Main.xml")]
+    [DataRow("./Assets/ExpressionLessSquare/Main.jack", "./Assets/ExpressionLessSquare/ValidOutput/Main.xml")]
+    [DataRow("./Assets/ExpressionLessSquare/Square.jack", "./Assets/ExpressionLessSquare/ValidOutput/Square.xml")]
+    [DataRow("./Assets/ExpressionLessSquare/SquareGame.jack", "./Assets/ExpressionLessSquare/ValidOutput/SquareGame.xml")]
+    [DataRow("./Assets/Square/Main.jack", "./Assets/Square/ValidOutput/Main.xml")]
+    [DataRow("./Assets/Square/Square.jack", "./Assets/Square/ValidOutput/Square.xml")]
+    [DataRow("./Assets/Square/SquareGame.jack", "./Assets/Square/ValidOutput/SquareGame.xml")]
     public void InitializeInstance_PassingCorrectInput_GeneratesCorrectOutput(string inputFilePath, string expectedFilePath)
     {
         bool expected = true;
