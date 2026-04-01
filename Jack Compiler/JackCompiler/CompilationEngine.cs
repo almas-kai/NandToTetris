@@ -23,10 +23,10 @@ internal class CompilationEngine : IDisposable
 
         _jackTokenizer.Advance();
 
-        (TokenType type, string rawValue) tempTokenRef = _jackTokenizer.CurrentToken;
-        if (tempTokenRef.type is not TokenType.KEYWORD)
+        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
+        if (token.type is not TokenType.KEYWORD)
         {
-            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" was expected. But got token type of \"{tempTokenRef.type}\".");
+            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" was expected. But got token type of \"{token.type}\".");
         }
         else if (_jackTokenizer.GetKeyword() is not Keyword.CLASS)
         {
@@ -42,10 +42,10 @@ internal class CompilationEngine : IDisposable
             _jackTokenizer.Advance();
         }
 
-        tempTokenRef = _jackTokenizer.CurrentToken;
-        if (tempTokenRef.type is not TokenType.IDENTIFIER)
+        token = _jackTokenizer.CurrentToken;
+        if (token.type is not TokenType.IDENTIFIER)
         {
-            throw new FormatException($"The token type of \"{TokenType.IDENTIFIER}\" was expected. But got: \"{tempTokenRef.type}\".");
+            throw new FormatException($"The token type of \"{TokenType.IDENTIFIER}\" was expected. But got: \"{token.type}\".");
         }
         else
         {
@@ -57,10 +57,10 @@ internal class CompilationEngine : IDisposable
             _jackTokenizer.Advance();
         }
 
-        tempTokenRef = _jackTokenizer.CurrentToken;
-        if (tempTokenRef.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
+        token = _jackTokenizer.CurrentToken;
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
         {
-            throw new FormatException($"The token type of \"{TokenType.SYMBOL}\" with the value of \"{{\" was expected. But got the token type of \"{tempTokenRef.type}\" with the value of \"{tempTokenRef.rawValue}\".");
+            throw new FormatException($"The token type of \"{TokenType.SYMBOL}\" with the value of \"{{\" was expected. But got the token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
         }
         else
         {
@@ -72,23 +72,23 @@ internal class CompilationEngine : IDisposable
             _jackTokenizer.Advance();
         }
 
-        tempTokenRef = _jackTokenizer.CurrentToken;
-        while (tempTokenRef.type is TokenType.KEYWORD && (_jackTokenizer.GetKeyword() is Keyword.STATIC or Keyword.FIELD))
+        token = _jackTokenizer.CurrentToken;
+        while (token.type is TokenType.KEYWORD && (_jackTokenizer.GetKeyword() is Keyword.STATIC or Keyword.FIELD))
         {
             CompileClassVarDec();
             _jackTokenizer.Advance();
-            tempTokenRef = _jackTokenizer.CurrentToken;
+            token = _jackTokenizer.CurrentToken;
         }
 
-        while (tempTokenRef.type is TokenType.KEYWORD && (_jackTokenizer.GetKeyword() is Keyword.FUNCTION or Keyword.CONSTRUCTOR or Keyword.METHOD))
+        while (token.type is TokenType.KEYWORD && (_jackTokenizer.GetKeyword() is Keyword.FUNCTION or Keyword.CONSTRUCTOR or Keyword.METHOD))
         {
             CompileSubroutine();
-            tempTokenRef = _jackTokenizer.CurrentToken;
+            token = _jackTokenizer.CurrentToken;
         }
 
-        if (tempTokenRef.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
         {
-            throw new FormatException($"The token type of \"{TokenType.SYMBOL}\" with the value of \"}}\" was expected. But got the token type of \"{tempTokenRef.type}\" with the value of \"{tempTokenRef.rawValue}\".");
+            throw new FormatException($"The token type of \"{TokenType.SYMBOL}\" with the value of \"}}\" was expected. But got the token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
         }
         else
         {
@@ -104,10 +104,10 @@ internal class CompilationEngine : IDisposable
     {
         Write("<classVarDec>");
 
-        (TokenType type, string rawValue) tempTokenRef = _jackTokenizer.CurrentToken;
-        if (tempTokenRef.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not (Keyword.FIELD or Keyword.STATIC))
+        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
+        if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not (Keyword.FIELD or Keyword.STATIC))
         {
-            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.FIELD}\" or \"{Keyword.STATIC}\" was expected. But got token type of \"{tempTokenRef.type}\" with the value of \"{tempTokenRef.rawValue}\".");
+            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.FIELD}\" or \"{Keyword.STATIC}\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
         }
         else
         {
@@ -119,12 +119,12 @@ internal class CompilationEngine : IDisposable
             _jackTokenizer.Advance();
         }
 
-        tempTokenRef = _jackTokenizer.CurrentToken;
-        if (tempTokenRef.type is not (TokenType.KEYWORD or TokenType.IDENTIFIER))
+        token = _jackTokenizer.CurrentToken;
+        if (token.type is not (TokenType.KEYWORD or TokenType.IDENTIFIER))
         {
-            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" or \"{TokenType.IDENTIFIER}\" was expected. But got token type of \"{tempTokenRef.type}\".");
+            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" or \"{TokenType.IDENTIFIER}\" was expected. But got token type of \"{token.type}\".");
         }
-        else if (tempTokenRef.type is TokenType.KEYWORD)
+        else if (token.type is TokenType.KEYWORD)
         {
             if (IsPrimitiveType(_jackTokenizer.GetKeyword()) is false)
             {
@@ -148,8 +148,8 @@ internal class CompilationEngine : IDisposable
             _jackTokenizer.Advance();
         }
 
-        tempTokenRef = _jackTokenizer.CurrentToken;
-        while (tempTokenRef.type is TokenType.IDENTIFIER)
+        token = _jackTokenizer.CurrentToken;
+        while (token.type is TokenType.IDENTIFIER)
         {
             WriteNode(
                 TokenType.IDENTIFIER.ToLowerString(),
@@ -158,8 +158,8 @@ internal class CompilationEngine : IDisposable
 
             _jackTokenizer.Advance();
 
-            tempTokenRef = _jackTokenizer.CurrentToken;
-            if (tempTokenRef.type == TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
+            token = _jackTokenizer.CurrentToken;
+            if (token.type == TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
             {
                 WriteNode(
                     TokenType.SYMBOL.ToLowerString(),
@@ -167,13 +167,13 @@ internal class CompilationEngine : IDisposable
                 );
 
                 _jackTokenizer.Advance();
-                tempTokenRef = _jackTokenizer.CurrentToken;
+                token = _jackTokenizer.CurrentToken;
             }
         }
 
-        if (tempTokenRef.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
         {
-            throw new FormatException($"Token type of \"{TokenType.SYMBOL}\" with the value of \";\" was expected. But got \"{tempTokenRef.type}\", with the type of \"{tempTokenRef.rawValue}\".");
+            throw new FormatException($"Token type of \"{TokenType.SYMBOL}\" with the value of \";\" was expected. But got \"{token.type}\", with the type of \"{token.rawValue}\".");
         }
         else
         {
@@ -188,10 +188,10 @@ internal class CompilationEngine : IDisposable
     private void CompileSubroutine()
     {
         Write("<subroutineDec>");
-        (TokenType type, string rawValue) tempTokenRef = _jackTokenizer.CurrentToken;
-        if (tempTokenRef.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not (Keyword.CONSTRUCTOR or Keyword.FUNCTION or Keyword.METHOD))
+        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
+        if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not (Keyword.CONSTRUCTOR or Keyword.FUNCTION or Keyword.METHOD))
         {
-            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.CONSTRUCTOR}\", \"{Keyword.FUNCTION}\", or \"{Keyword.METHOD}\" was expected. But got token type of \"{tempTokenRef.type}\" with the value of \"{tempTokenRef.rawValue}\".");
+            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.CONSTRUCTOR}\", \"{Keyword.FUNCTION}\", or \"{Keyword.METHOD}\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
         }
         else
         {
@@ -202,12 +202,12 @@ internal class CompilationEngine : IDisposable
             _jackTokenizer.Advance();
         }
 
-        tempTokenRef = _jackTokenizer.CurrentToken;
-        if (tempTokenRef.type is not (TokenType.KEYWORD or TokenType.IDENTIFIER))
+        token = _jackTokenizer.CurrentToken;
+        if (token.type is not (TokenType.KEYWORD or TokenType.IDENTIFIER))
         {
-            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" or \"{TokenType.IDENTIFIER}\" was expected. But got token type of \"{tempTokenRef.type}\" with the value of \"{tempTokenRef.rawValue}\".");
+            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" or \"{TokenType.IDENTIFIER}\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
         }
-        else if (tempTokenRef.type is TokenType.KEYWORD)
+        else if (token.type is TokenType.KEYWORD)
         {
             if (_jackTokenizer.GetKeyword() is not Keyword.VOID && IsPrimitiveType(_jackTokenizer.GetKeyword()) is false)
             {
@@ -231,10 +231,10 @@ internal class CompilationEngine : IDisposable
             _jackTokenizer.Advance();
         }
 
-        tempTokenRef = _jackTokenizer.CurrentToken;
-        if (tempTokenRef.type is not TokenType.IDENTIFIER)
+        token = _jackTokenizer.CurrentToken;
+        if (token.type is not TokenType.IDENTIFIER)
         {
-            throw new FormatException($"Token type of \"{TokenType.IDENTIFIER}\" was expected. But got token type of \"{tempTokenRef.type}\" with the value of \"{tempTokenRef.rawValue}\".");
+            throw new FormatException($"Token type of \"{TokenType.IDENTIFIER}\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
         }
         else
         {
@@ -246,10 +246,10 @@ internal class CompilationEngine : IDisposable
             _jackTokenizer.Advance();
         }
 
-        tempTokenRef = _jackTokenizer.CurrentToken;
-        if (tempTokenRef.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "(")
+        token = _jackTokenizer.CurrentToken;
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "(")
         {
-            throw new FormatException($"Token type of \"{TokenType.SYMBOL}\" with the value of \"(\" was expected. But got token type of \"{tempTokenRef.type}\" with the value of \"{tempTokenRef.rawValue}\".");
+            throw new FormatException($"Token type of \"{TokenType.SYMBOL}\" with the value of \"(\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
         }
         else
         {
@@ -262,7 +262,7 @@ internal class CompilationEngine : IDisposable
 
             CompileParameterList();
 
-            if (tempTokenRef.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ")")
+            if (token.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ")")
             {
                 WriteNode(
                     TokenType.SYMBOL.ToLowerString(),
@@ -273,18 +273,18 @@ internal class CompilationEngine : IDisposable
             }
             else
             {
-                throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \")\". But got \"{tempTokenRef.type}\" with the value of \"{tempTokenRef.rawValue}\".");
+                throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \")\". But got \"{token.type}\" with the value of \"{token.rawValue}\".");
             }
 
-            if (tempTokenRef.type is not TokenType.SYMBOL)
+            if (token.type is not TokenType.SYMBOL)
             {
-                throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\". But got \"{tempTokenRef.type}\".");
+                throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\". But got \"{token.type}\".");
             }
             else
             {
                 if (_jackTokenizer.GetSymbol() is not "{")
                 {
-                    throw new FormatException($"Expected symbol of \"{{\". But got \"{tempTokenRef.rawValue}\".");
+                    throw new FormatException($"Expected symbol of \"{{\". But got \"{token.rawValue}\".");
                 }
 
                 CompileSubroutineBody();
@@ -297,10 +297,10 @@ internal class CompilationEngine : IDisposable
     {
         Write("<parameterList>");
 
-        (TokenType type, string rawValue) tempTokenRef = _jackTokenizer.CurrentToken;
-        while (tempTokenRef.type is TokenType.KEYWORD or TokenType.IDENTIFIER)
+        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
+        while (token.type is TokenType.KEYWORD or TokenType.IDENTIFIER)
         {
-            if (tempTokenRef.type is TokenType.KEYWORD)
+            if (token.type is TokenType.KEYWORD)
             {
                 if (IsPrimitiveType(_jackTokenizer.GetKeyword()) is false)
                 {
@@ -322,16 +322,16 @@ internal class CompilationEngine : IDisposable
 
             _jackTokenizer.Advance();
 
-            tempTokenRef = _jackTokenizer.CurrentToken;
+            token = _jackTokenizer.CurrentToken;
 
-            if (tempTokenRef.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
+            if (token.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
             {
                 WriteNode(
                     TokenType.SYMBOL.ToLowerString(),
                     _jackTokenizer.GetSymbol()
                 );
                 _jackTokenizer.Advance();
-                tempTokenRef = _jackTokenizer.CurrentToken;
+                token = _jackTokenizer.CurrentToken;
             }
         }
 
@@ -341,10 +341,10 @@ internal class CompilationEngine : IDisposable
     {
         Write("<subroutineBody>");
 
-        (TokenType tokenType, string rawValue) tempTokenRef = _jackTokenizer.CurrentToken;
-        if (tempTokenRef.tokenType is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
+        (TokenType tokenType, string rawValue) token = _jackTokenizer.CurrentToken;
+        if (token.tokenType is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\", with the value of \"{{\". But got token type of \"{tempTokenRef.tokenType}\", with the value of \"{tempTokenRef.rawValue}\".");
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\", with the value of \"{{\". But got token type of \"{token.tokenType}\", with the value of \"{token.rawValue}\".");
         }
 
         WriteNode(
@@ -353,22 +353,22 @@ internal class CompilationEngine : IDisposable
         );
         _jackTokenizer.Advance();
 
-        tempTokenRef = _jackTokenizer.CurrentToken;
-        while (tempTokenRef.tokenType is TokenType.KEYWORD && _jackTokenizer.GetKeyword() is Keyword.VAR)
+        token = _jackTokenizer.CurrentToken;
+        while (token.tokenType is TokenType.KEYWORD && _jackTokenizer.GetKeyword() is Keyword.VAR)
         {
             CompileVarDec();
-            tempTokenRef = _jackTokenizer.CurrentToken;
+            token = _jackTokenizer.CurrentToken;
         }
 
-        if (tempTokenRef.tokenType is TokenType.KEYWORD && IsStatementKeyword(_jackTokenizer.GetKeyword()))
+        if (token.tokenType is TokenType.KEYWORD && IsStatementKeyword(_jackTokenizer.GetKeyword()))
         {
             CompileStatements();
-            tempTokenRef = _jackTokenizer.CurrentToken;
+            token = _jackTokenizer.CurrentToken;
         }
 
-        if (tempTokenRef.tokenType is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
+        if (token.tokenType is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\", with the value of \"}}\". But got token type of \"{tempTokenRef.tokenType}\", with the value of \"{tempTokenRef.rawValue}\".");
+            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\", with the value of \"}}\". But got token type of \"{token.tokenType}\", with the value of \"{token.rawValue}\".");
         }
 
         WriteNode(
