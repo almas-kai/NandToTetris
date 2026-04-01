@@ -23,24 +23,19 @@ internal static class TXMLGenerator
                 switch (type)
                 {
                     case TokenType.KEYWORD:
-                        Keyword keyword = jackTokenizer.GetKeyword();
-                        writer.WriteLine($"<keyword> {keyword.ToLowerString()} </keyword>");
+                        writer.WriteLine($"<keyword> {jackTokenizer.GetKeyword().ToLowerString()} </keyword>");
                         break;
                     case TokenType.SYMBOL:
-                        string symbol = jackTokenizer.GetSymbol();
-                        writer.WriteLine($"<symbol> {symbol} </symbol>");
+                        writer.WriteLine($"<symbol> {jackTokenizer.GetSymbol()} </symbol>");
                         break;
                     case TokenType.IDENTIFIER:
-                        string identifier = jackTokenizer.GetIdentifier();
-                        writer.WriteLine($"<identifier> {identifier} </identifier>");
+                        writer.WriteLine($"<identifier> {jackTokenizer.GetIdentifier()} </identifier>");
                         break;
                     case TokenType.INT_CONST:
-                        int intConstant = jackTokenizer.GetUInt15Constant();
-                        writer.WriteLine($"<integerConstant> {intConstant} </integerConstant>");
+                        writer.WriteLine($"<integerConstant> {jackTokenizer.GetUInt15Constant()} </integerConstant>");
                         break;
                     case TokenType.STRING_CONST:
-                        string stringConstant = jackTokenizer.GetString();
-                        writer.WriteLine($"<stringConstant> {stringConstant} </stringConstant>");
+                        writer.WriteLine($"<stringConstant> {jackTokenizer.GetString()} </stringConstant>");
                         break;
                     default:
                         throw new FormatException($"Cannot generate testing XML file. Unrecognized token type: \"{type}\".");
