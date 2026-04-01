@@ -24,7 +24,7 @@ internal static class TXMLGenerator
                 {
                     case TokenType.KEYWORD:
                         Keyword keyword = jackTokenizer.GetKeyword();
-                        writer.WriteLine($"<keyword> {EnumToString<Keyword>.ConvertToLower(keyword)} </keyword>");
+                        writer.WriteLine($"<keyword> {keyword.ToLowerString()} </keyword>");
                         break;
                     case TokenType.SYMBOL:
                         string symbol = jackTokenizer.GetSymbol();
@@ -43,7 +43,7 @@ internal static class TXMLGenerator
                         writer.WriteLine($"<stringConstant> {stringConstant} </stringConstant>");
                         break;
                     default:
-                        throw new FormatException($"Tokenizer error. Cannot generate testing XML file. Unrecognized token type: \"{type}\".");
+                        throw new FormatException($"Cannot generate testing XML file. Unrecognized token type: \"{type}\".");
                 }
             }
             writer.WriteLine("</tokens>");

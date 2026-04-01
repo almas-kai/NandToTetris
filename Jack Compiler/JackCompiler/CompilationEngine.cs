@@ -35,11 +35,10 @@ internal class CompilationEngine : IDisposable
         else
         {
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
-            EnumToString<Keyword>.ConvertToLower(
-            _jackTokenizer.GetKeyword()
-            )
+                TokenType.KEYWORD.ToLowerString(),
+                _jackTokenizer.GetKeyword().ToLowerString()
             );
+
             _jackTokenizer.Advance();
         }
 
@@ -51,9 +50,10 @@ internal class CompilationEngine : IDisposable
         else
         {
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
-            _jackTokenizer.GetIdentifier()
+                TokenType.IDENTIFIER.ToLowerString(),
+                _jackTokenizer.GetIdentifier()
             );
+
             _jackTokenizer.Advance();
         }
 
@@ -65,9 +65,10 @@ internal class CompilationEngine : IDisposable
         else
         {
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
-            _jackTokenizer.GetSymbol()
+                TokenType.SYMBOL.ToLowerString(),
+                _jackTokenizer.GetSymbol()
             );
+
             _jackTokenizer.Advance();
         }
 
@@ -92,8 +93,8 @@ internal class CompilationEngine : IDisposable
         else
         {
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
-            _jackTokenizer.GetSymbol()
+                TokenType.SYMBOL.ToLowerString(),
+                _jackTokenizer.GetSymbol()
             );
         }
 
@@ -111,9 +112,10 @@ internal class CompilationEngine : IDisposable
         else
         {
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
-            EnumToString<Keyword>.ConvertToLower(_jackTokenizer.GetKeyword())
+                TokenType.KEYWORD.ToLowerString(),
+                _jackTokenizer.GetKeyword().ToLowerString()
             );
+
             _jackTokenizer.Advance();
         }
 
@@ -130,17 +132,19 @@ internal class CompilationEngine : IDisposable
             }
 
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
-            EnumToString<Keyword>.ConvertToLower(_jackTokenizer.GetKeyword())
+                TokenType.KEYWORD.ToLowerString(),
+                _jackTokenizer.GetKeyword().ToLowerString()
             );
+
             _jackTokenizer.Advance();
         }
         else
         {
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
-            _jackTokenizer.GetIdentifier()
+                TokenType.IDENTIFIER.ToLowerString(),
+                _jackTokenizer.GetIdentifier()
             );
+
             _jackTokenizer.Advance();
         }
 
@@ -148,18 +152,20 @@ internal class CompilationEngine : IDisposable
         while (tempTokenRef.type is TokenType.IDENTIFIER)
         {
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
-            _jackTokenizer.GetIdentifier()
+                TokenType.IDENTIFIER.ToLowerString(),
+                _jackTokenizer.GetIdentifier()
             );
+
             _jackTokenizer.Advance();
 
             tempTokenRef = _jackTokenizer.CurrentToken;
             if (tempTokenRef.type == TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
             {
                 WriteNode(
-                EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
-                _jackTokenizer.GetSymbol()
+                    TokenType.SYMBOL.ToLowerString(),
+                    _jackTokenizer.GetSymbol()
                 );
+
                 _jackTokenizer.Advance();
                 tempTokenRef = _jackTokenizer.CurrentToken;
             }
@@ -172,8 +178,8 @@ internal class CompilationEngine : IDisposable
         else
         {
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
-            _jackTokenizer.GetSymbol()
+                TokenType.SYMBOL.ToLowerString(),
+                _jackTokenizer.GetSymbol()
             );
         }
 
@@ -190,8 +196,8 @@ internal class CompilationEngine : IDisposable
         else
         {
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
-            EnumToString<Keyword>.ConvertToLower(_jackTokenizer.GetKeyword())
+                TokenType.KEYWORD.ToLowerString(),
+                _jackTokenizer.GetKeyword().ToLowerString()
             );
             _jackTokenizer.Advance();
         }
@@ -209,17 +215,19 @@ internal class CompilationEngine : IDisposable
             }
 
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
-            EnumToString<Keyword>.ConvertToLower(_jackTokenizer.GetKeyword())
+                TokenType.KEYWORD.ToLowerString(),
+                _jackTokenizer.GetKeyword().ToLowerString()
             );
+
             _jackTokenizer.Advance();
         }
         else
         {
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
-            _jackTokenizer.GetIdentifier()
+                TokenType.IDENTIFIER.ToLowerString(),
+                _jackTokenizer.GetIdentifier()
             );
+
             _jackTokenizer.Advance();
         }
 
@@ -231,9 +239,10 @@ internal class CompilationEngine : IDisposable
         else
         {
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
-            _jackTokenizer.GetIdentifier()
+                TokenType.IDENTIFIER.ToLowerString(),
+                _jackTokenizer.GetIdentifier()
             );
+
             _jackTokenizer.Advance();
         }
 
@@ -245,21 +254,21 @@ internal class CompilationEngine : IDisposable
         else
         {
             WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
-            _jackTokenizer.GetSymbol()
+                TokenType.SYMBOL.ToLowerString(),
+                _jackTokenizer.GetSymbol()
             );
+
             _jackTokenizer.Advance();
 
             CompileParameterList();
 
-            //tempTokenRef = _jackTokenizer.CurrentToken;
-
             if (tempTokenRef.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ")")
             {
                 WriteNode(
-                EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
-                _jackTokenizer.GetSymbol()
+                    TokenType.SYMBOL.ToLowerString(),
+                    _jackTokenizer.GetSymbol()
                 );
+
                 _jackTokenizer.Advance();
             }
             else
@@ -299,14 +308,14 @@ internal class CompilationEngine : IDisposable
                 }
 
                 WriteNode(
-                EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
-                EnumToString<Keyword>.ConvertToLower(_jackTokenizer.GetKeyword())
+                    TokenType.KEYWORD.ToLowerString(),
+                    _jackTokenizer.GetKeyword().ToLowerString()
                 );
             }
             else
             {
                 WriteNode(
-                    EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
+                    TokenType.IDENTIFIER.ToLowerString(),
                     _jackTokenizer.GetIdentifier()
                 );
             }
@@ -318,7 +327,7 @@ internal class CompilationEngine : IDisposable
             if (tempTokenRef.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
             {
                 WriteNode(
-                    EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                    TokenType.SYMBOL.ToLowerString(),
                     _jackTokenizer.GetSymbol()
                 );
                 _jackTokenizer.Advance();
@@ -339,7 +348,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
         _jackTokenizer.Advance();
@@ -363,7 +372,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
         _jackTokenizer.Advance();
@@ -381,8 +390,8 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
-            EnumToString<Keyword>.ConvertToLower(_jackTokenizer.GetKeyword())
+            TokenType.KEYWORD.ToLowerString(),
+            _jackTokenizer.GetKeyword().ToLowerString()
         );
 
         _jackTokenizer.Advance();
@@ -391,14 +400,14 @@ internal class CompilationEngine : IDisposable
         if (token.type is TokenType.KEYWORD && IsPrimitiveType(_jackTokenizer.GetKeyword()))
         {
             WriteNode(
-                EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
-                EnumToString<Keyword>.ConvertToLower(_jackTokenizer.GetKeyword())
+                TokenType.KEYWORD.ToLowerString(),
+                _jackTokenizer.GetKeyword().ToLowerString()
             );
         }
         else if (token.type is TokenType.IDENTIFIER)
         {
             WriteNode(
-                EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
+                TokenType.IDENTIFIER.ToLowerString(),
                 _jackTokenizer.GetIdentifier()
             );
         }
@@ -413,7 +422,7 @@ internal class CompilationEngine : IDisposable
         while (token.type is TokenType.IDENTIFIER)
         {
             WriteNode(
-                EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
+                TokenType.IDENTIFIER.ToLowerString(),
                 _jackTokenizer.GetIdentifier()
             );
 
@@ -423,7 +432,7 @@ internal class CompilationEngine : IDisposable
             if (token.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
             {
                 WriteNode(
-                    EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                    TokenType.SYMBOL.ToLowerString(),
                     _jackTokenizer.GetSymbol()
                 );
                 _jackTokenizer.Advance();
@@ -437,7 +446,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
         _jackTokenizer.Advance();
@@ -488,9 +497,10 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(token.type),
-            EnumToString<Keyword>.ConvertToLower(_jackTokenizer.GetKeyword())
+            token.type.ToLowerString(),
+            _jackTokenizer.GetKeyword().ToLowerString()
         );
+
         _jackTokenizer.Advance();
 
         token = _jackTokenizer.CurrentToken;
@@ -500,9 +510,10 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
+            TokenType.IDENTIFIER.ToLowerString(),
             _jackTokenizer.GetIdentifier()
         );
+
         _jackTokenizer.Advance();
 
         token = _jackTokenizer.CurrentToken;
@@ -512,7 +523,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -529,7 +540,7 @@ internal class CompilationEngine : IDisposable
         else if (_jackTokenizer.GetSymbol() is "]")
         {
             WriteNode(
-                EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                TokenType.SYMBOL.ToLowerString(),
                 _jackTokenizer.GetSymbol()
             );
 
@@ -543,7 +554,7 @@ internal class CompilationEngine : IDisposable
             }
 
             WriteNode(
-                EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                TokenType.SYMBOL.ToLowerString(),
                 _jackTokenizer.GetSymbol()
             );
 
@@ -560,7 +571,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -580,8 +591,8 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
-            EnumToString<Keyword>.ConvertToLower(Keyword.IF)
+            TokenType.KEYWORD.ToLowerString(),
+            Keyword.IF.ToLowerString()
         );
 
         _jackTokenizer.Advance();
@@ -594,7 +605,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -610,7 +621,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -622,7 +633,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -638,7 +649,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -649,8 +660,8 @@ internal class CompilationEngine : IDisposable
         if (token.type is TokenType.KEYWORD && _jackTokenizer.GetKeyword() is Keyword.ELSE)
         {
             WriteNode(
-                EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
-                EnumToString<Keyword>.ConvertToLower(Keyword.ELSE)
+                TokenType.KEYWORD.ToLowerString(),
+                Keyword.ELSE.ToLowerString()
             );
 
             _jackTokenizer.Advance();
@@ -663,7 +674,7 @@ internal class CompilationEngine : IDisposable
             }
 
             WriteNode(
-                EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                TokenType.SYMBOL.ToLowerString(),
                 _jackTokenizer.GetSymbol()
             );
 
@@ -679,7 +690,7 @@ internal class CompilationEngine : IDisposable
             }
 
             WriteNode(
-                EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                TokenType.SYMBOL.ToLowerString(),
                 _jackTokenizer.GetSymbol()
             );
 
@@ -700,8 +711,8 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
-            EnumToString<Keyword>.ConvertToLower(Keyword.WHILE)
+            TokenType.KEYWORD.ToLowerString(),
+            Keyword.WHILE.ToLowerString()
         );
 
         _jackTokenizer.Advance();
@@ -714,7 +725,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -730,7 +741,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -744,7 +755,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -760,7 +771,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -780,8 +791,8 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
-            EnumToString<Keyword>.ConvertToLower(_jackTokenizer.GetKeyword())
+            TokenType.KEYWORD.ToLowerString(),
+            _jackTokenizer.GetKeyword().ToLowerString()
         );
 
         _jackTokenizer.Advance();
@@ -794,7 +805,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
+            TokenType.IDENTIFIER.ToLowerString(),
             _jackTokenizer.GetIdentifier()
         );
 
@@ -810,7 +821,7 @@ internal class CompilationEngine : IDisposable
         if (_jackTokenizer.GetSymbol() is ".")
         {
             WriteNode(
-                EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                TokenType.SYMBOL.ToLowerString(),
                 _jackTokenizer.GetSymbol()
             );
 
@@ -824,7 +835,7 @@ internal class CompilationEngine : IDisposable
             }
 
             WriteNode(
-                EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
+                TokenType.IDENTIFIER.ToLowerString(),
                 _jackTokenizer.GetIdentifier()
             );
 
@@ -839,7 +850,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -855,7 +866,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -869,7 +880,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -889,8 +900,8 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.KEYWORD),
-            EnumToString<Keyword>.ConvertToLower(Keyword.RETURN)
+            TokenType.KEYWORD.ToLowerString(),
+            Keyword.RETURN.ToLowerString()
         );
 
         _jackTokenizer.Advance();
@@ -909,7 +920,7 @@ internal class CompilationEngine : IDisposable
         }
 
         WriteNode(
-            EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+            TokenType.SYMBOL.ToLowerString(),
             _jackTokenizer.GetSymbol()
         );
 
@@ -932,7 +943,7 @@ internal class CompilationEngine : IDisposable
             if (token.type is TokenType.SYMBOL && IsValidOperator(_jackTokenizer.GetSymbol()))
             {
                 WriteNode(
-                    EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                    TokenType.SYMBOL.ToLowerString(),
                     _jackTokenizer.GetSymbol()
                 );
 
@@ -964,14 +975,14 @@ internal class CompilationEngine : IDisposable
                 break;
             case TokenType.KEYWORD when IsKeywordConstant(_jackTokenizer.GetKeyword()):
                 WriteNode(
-                    EnumToString<TokenType>.ConvertToLower(token.type),
-                    EnumToString<Keyword>.ConvertToLower(_jackTokenizer.GetKeyword())
+                    token.type.ToLowerString(),
+                    _jackTokenizer.GetKeyword().ToLowerString()
                 );
                 _jackTokenizer.Advance();
                 break;
             case TokenType.IDENTIFIER when !(_jackTokenizer.Peek().type is TokenType.SYMBOL && _jackTokenizer.Peek().value is "." or "("):
                 WriteNode(
-                    EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
+                    TokenType.IDENTIFIER.ToLowerString(),
                     _jackTokenizer.GetIdentifier()
                 );
 
@@ -982,7 +993,7 @@ internal class CompilationEngine : IDisposable
                 if (token.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is "[")
                 {
                     WriteNode(
-                        EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                        TokenType.SYMBOL.ToLowerString(),
                         _jackTokenizer.GetSymbol()
                     );
 
@@ -998,7 +1009,7 @@ internal class CompilationEngine : IDisposable
                     }
 
                     WriteNode(
-                        EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                        TokenType.SYMBOL.ToLowerString(),
                         _jackTokenizer.GetSymbol()
                     );
 
@@ -1009,7 +1020,7 @@ internal class CompilationEngine : IDisposable
                 if (_jackTokenizer.GetSymbol() is "(")
                 {
                     WriteNode(
-                        EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                        TokenType.SYMBOL.ToLowerString(),
                         _jackTokenizer.GetSymbol()
                     );
 
@@ -1025,7 +1036,7 @@ internal class CompilationEngine : IDisposable
                     }
 
                     WriteNode(
-                        EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                        TokenType.SYMBOL.ToLowerString(),
                         _jackTokenizer.GetSymbol()
                     );
 
@@ -1034,7 +1045,7 @@ internal class CompilationEngine : IDisposable
                 else
                 {
                     WriteNode(
-                        EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                        TokenType.SYMBOL.ToLowerString(),
                         _jackTokenizer.GetSymbol()
                     );
                     
@@ -1045,7 +1056,7 @@ internal class CompilationEngine : IDisposable
                 break;
             case TokenType.IDENTIFIER when _jackTokenizer.Peek().type is TokenType.SYMBOL && _jackTokenizer.Peek().value is "." or "(":
                 WriteNode(
-                    EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
+                    TokenType.IDENTIFIER.ToLowerString(),
                     _jackTokenizer.GetIdentifier()
                 );
 
@@ -1054,7 +1065,7 @@ internal class CompilationEngine : IDisposable
                 if (_jackTokenizer.GetSymbol() is ".")
                 {
                     WriteNode(
-                        EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                        TokenType.SYMBOL.ToLowerString(),
                         _jackTokenizer.GetSymbol()
                     );
 
@@ -1068,7 +1079,7 @@ internal class CompilationEngine : IDisposable
                     }
 
                     WriteNode(
-                        EnumToString<TokenType>.ConvertToLower(TokenType.IDENTIFIER),
+                        TokenType.IDENTIFIER.ToLowerString(),
                         _jackTokenizer.GetIdentifier()
                     );
 
@@ -1076,7 +1087,7 @@ internal class CompilationEngine : IDisposable
                 }
 
                 WriteNode(
-                    EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                    TokenType.SYMBOL.ToLowerString(),
                     _jackTokenizer.GetSymbol()
                 );
 
@@ -1092,7 +1103,7 @@ internal class CompilationEngine : IDisposable
                 }
 
                 WriteNode(
-                    EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                    TokenType.SYMBOL.ToLowerString(),
                     _jackTokenizer.GetSymbol()
                 );
 
@@ -1120,7 +1131,7 @@ internal class CompilationEngine : IDisposable
             if (token.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
             {
                 WriteNode(
-                    EnumToString<TokenType>.ConvertToLower(TokenType.SYMBOL),
+                    TokenType.SYMBOL.ToLowerString(),
                     _jackTokenizer.GetSymbol()
                 );
 
