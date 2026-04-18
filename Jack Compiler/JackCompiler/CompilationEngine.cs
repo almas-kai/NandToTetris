@@ -26,11 +26,17 @@ internal class CompilationEngine : IDisposable
         (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
         if (token.type is not TokenType.KEYWORD)
         {
-            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" was expected. But got token type of \"{token.type}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.KEYWORD)
+                .Build();
         }
         else if (_jackTokenizer.GetKeyword() is not Keyword.CLASS)
         {
-            throw new FormatException($"Keyword of \"{Keyword.CLASS}\" was expected. But got keyword of \"{_jackTokenizer.GetKeyword()}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.KEYWORD, Keyword.CLASS)
+                .Build();
         }
         else
         {
@@ -45,7 +51,10 @@ internal class CompilationEngine : IDisposable
         token = _jackTokenizer.CurrentToken;
         if (token.type is not TokenType.IDENTIFIER)
         {
-            throw new FormatException($"The token type of \"{TokenType.IDENTIFIER}\" was expected. But got: \"{token.type}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.IDENTIFIER)
+                .Build();
         }
         else
         {
@@ -60,7 +69,10 @@ internal class CompilationEngine : IDisposable
         token = _jackTokenizer.CurrentToken;
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
         {
-            throw new FormatException($"The token type of \"{TokenType.SYMBOL}\" with the value of \"{{\" was expected. But got the token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "{")
+                .Build();
         }
         else
         {
@@ -88,7 +100,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
         {
-            throw new FormatException($"The token type of \"{TokenType.SYMBOL}\" with the value of \"}}\" was expected. But got the token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "}")
+                .Build();
         }
         else
         {
@@ -107,7 +122,13 @@ internal class CompilationEngine : IDisposable
         (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
         if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not (Keyword.FIELD or Keyword.STATIC))
         {
-            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.FIELD}\" or \"{Keyword.STATIC}\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.KEYWORD, [
+                    Keyword.FIELD,
+                    Keyword.STATIC
+                ])
+                .Build();
         }
         else
         {
@@ -122,13 +143,24 @@ internal class CompilationEngine : IDisposable
         token = _jackTokenizer.CurrentToken;
         if (token.type is not (TokenType.KEYWORD or TokenType.IDENTIFIER))
         {
-            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" or \"{TokenType.IDENTIFIER}\" was expected. But got token type of \"{token.type}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.KEYWORD)
+                .AddExpected(TokenType.IDENTIFIER)
+                .Build();
         }
         else if (token.type is TokenType.KEYWORD)
         {
             if (IsPrimitiveType(_jackTokenizer.GetKeyword()) is false)
             {
-                throw new FormatException($"Primitive keyword was expected. But got keyword of \"{_jackTokenizer.GetKeyword()}\".");
+                throw new FormatExceptionBuilder()
+                    .AddUnexpected(token.type, token.rawValue)
+                    .AddExpected(TokenType.KEYWORD, [
+                        Keyword.INT,
+                        Keyword.BOOLEAN,
+                        Keyword.CHAR
+                    ])
+                    .Build();
             }
 
             WriteNode(
@@ -173,7 +205,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
         {
-            throw new FormatException($"Token type of \"{TokenType.SYMBOL}\" with the value of \";\" was expected. But got \"{token.type}\", with the type of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, ";")
+                .Build();
         }
         else
         {
@@ -191,7 +226,14 @@ internal class CompilationEngine : IDisposable
         (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
         if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not (Keyword.CONSTRUCTOR or Keyword.FUNCTION or Keyword.METHOD))
         {
-            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.CONSTRUCTOR}\", \"{Keyword.FUNCTION}\", or \"{Keyword.METHOD}\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.KEYWORD, [
+                    Keyword.CONSTRUCTOR,
+                    Keyword.FUNCTION,
+                    Keyword.METHOD
+                ])
+                .Build();
         }
         else
         {
@@ -205,13 +247,25 @@ internal class CompilationEngine : IDisposable
         token = _jackTokenizer.CurrentToken;
         if (token.type is not (TokenType.KEYWORD or TokenType.IDENTIFIER))
         {
-            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" or \"{TokenType.IDENTIFIER}\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.KEYWORD)
+                .AddExpected(TokenType.IDENTIFIER)
+                .Build();
         }
         else if (token.type is TokenType.KEYWORD)
         {
             if (_jackTokenizer.GetKeyword() is not Keyword.VOID && IsPrimitiveType(_jackTokenizer.GetKeyword()) is false)
             {
-                throw new FormatException($"Primitive keyword or \"{Keyword.VOID}\" was expected. But got keyword of \"{_jackTokenizer.GetKeyword()}\".");
+                throw new FormatExceptionBuilder()
+                    .AddUnexpected(token.type, token.rawValue)
+                    .AddExpected(TokenType.KEYWORD, [
+                        Keyword.INT,
+                        Keyword.BOOLEAN,
+                        Keyword.CHAR,
+                        Keyword.VOID
+                    ])
+                    .Build();
             }
 
             WriteNode(
@@ -234,7 +288,10 @@ internal class CompilationEngine : IDisposable
         token = _jackTokenizer.CurrentToken;
         if (token.type is not TokenType.IDENTIFIER)
         {
-            throw new FormatException($"Token type of \"{TokenType.IDENTIFIER}\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.IDENTIFIER)
+                .Build();
         }
         else
         {
@@ -249,7 +306,10 @@ internal class CompilationEngine : IDisposable
         token = _jackTokenizer.CurrentToken;
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "(")
         {
-            throw new FormatException($"Token type of \"{TokenType.SYMBOL}\" with the value of \"(\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "(")
+                .Build();
         }
         else
         {
@@ -273,18 +333,27 @@ internal class CompilationEngine : IDisposable
             }
             else
             {
-                throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \")\". But got \"{token.type}\" with the value of \"{token.rawValue}\".");
+                throw new FormatExceptionBuilder()
+                    .AddUnexpected(token.type, token.rawValue)
+                    .AddExpected(TokenType.SYMBOL, ")")
+                    .Build();
             }
 
             if (token.type is not TokenType.SYMBOL)
             {
-                throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\". But got \"{token.type}\".");
+                throw new FormatExceptionBuilder()
+                    .AddUnexpected(token.type, token.rawValue)
+                    .AddExpected(TokenType.SYMBOL)
+                    .Build();
             }
             else
             {
                 if (_jackTokenizer.GetSymbol() is not "{")
                 {
-                    throw new FormatException($"Expected symbol of \"{{\". But got \"{token.rawValue}\".");
+                    throw new FormatExceptionBuilder()
+                        .AddUnexpected(token.type, token.rawValue)
+                        .AddExpected(TokenType.SYMBOL, "{")
+                        .Build();
                 }
 
                 CompileSubroutineBody();
@@ -304,7 +373,14 @@ internal class CompilationEngine : IDisposable
             {
                 if (IsPrimitiveType(_jackTokenizer.GetKeyword()) is false)
                 {
-                    throw new FormatException($"A primitive is expected. But got \"{_jackTokenizer.GetKeyword()}\".");
+                    throw new FormatExceptionBuilder()
+                        .AddUnexpected(token.type, token.rawValue)
+                        .AddExpected(TokenType.KEYWORD, [
+                            Keyword.INT,
+                            Keyword.BOOLEAN,
+                            Keyword.CHAR
+                        ])
+                        .Build();
                 }
 
                 WriteNode(
@@ -341,10 +417,13 @@ internal class CompilationEngine : IDisposable
     {
         Write("<subroutineBody>");
 
-        (TokenType tokenType, string rawValue) token = _jackTokenizer.CurrentToken;
-        if (token.tokenType is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
+        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\", with the value of \"{{\". But got token type of \"{token.tokenType}\", with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "{")
+                .Build();
         }
 
         WriteNode(
@@ -354,21 +433,24 @@ internal class CompilationEngine : IDisposable
         _jackTokenizer.Advance();
 
         token = _jackTokenizer.CurrentToken;
-        while (token.tokenType is TokenType.KEYWORD && _jackTokenizer.GetKeyword() is Keyword.VAR)
+        while (token.type is TokenType.KEYWORD && _jackTokenizer.GetKeyword() is Keyword.VAR)
         {
             CompileVarDec();
             token = _jackTokenizer.CurrentToken;
         }
 
-        if (token.tokenType is TokenType.KEYWORD && IsStatementKeyword(_jackTokenizer.GetKeyword()))
+        if (token.type is TokenType.KEYWORD && IsStatementKeyword(_jackTokenizer.GetKeyword()))
         {
             CompileStatements();
             token = _jackTokenizer.CurrentToken;
         }
 
-        if (token.tokenType is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
+        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\", with the value of \"}}\". But got token type of \"{token.tokenType}\", with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "}")
+                .Build();
         }
 
         WriteNode(
@@ -386,7 +468,10 @@ internal class CompilationEngine : IDisposable
         (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
         if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.VAR)
         {
-            throw new FormatException($"The token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.VAR}\" is expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.KEYWORD, Keyword.VAR)
+                .Build();
         }
 
         WriteNode(
@@ -413,7 +498,14 @@ internal class CompilationEngine : IDisposable
         }
         else
         {
-            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.INT}\", or \"{Keyword.CHAR}\", or \"{Keyword.BOOLEAN}\" was expected. Or token type of \"{TokenType.IDENTIFIER}\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.KEYWORD, [
+                    Keyword.INT,
+                    Keyword.CHAR,
+                    Keyword.BOOLEAN
+                ])
+                .Build();
         }
 
         _jackTokenizer.Advance();
@@ -442,7 +534,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
         {
-            throw new FormatException($"Token type of the \"{TokenType.SYMBOL}\" with the value of \";\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, ";")
+                .Build();
         }
 
         WriteNode(
@@ -478,7 +573,18 @@ internal class CompilationEngine : IDisposable
                     CompileReturn();
                     break;
                 default:
-                    throw new FormatException($"One of these keywords were expected: \"{Keyword.LET}\", \"{Keyword.IF}\", \"{Keyword.WHILE}\", \"{Keyword.DO}\", or \"{Keyword.RETURN}\" But got this keyword: \"{_jackTokenizer.GetKeyword()}\".");
+                    throw new FormatExceptionBuilder()
+                        .AddUnexpected(token.type, token.rawValue)
+                        .AddExpected(
+                            TokenType.KEYWORD,
+                            [
+                                Keyword.LET,
+                                Keyword.IF,
+                                Keyword.WHILE,
+                                Keyword.DO,
+                                Keyword.RETURN
+                            ])
+                        .Build();
             }
 
             token = _jackTokenizer.CurrentToken;
@@ -493,7 +599,10 @@ internal class CompilationEngine : IDisposable
         (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
         if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.LET)
         {
-            throw new FormatException($"Token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.LET}\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.KEYWORD, Keyword.LET)
+                .Build();
         }
 
         WriteNode(
@@ -506,7 +615,10 @@ internal class CompilationEngine : IDisposable
         token = _jackTokenizer.CurrentToken;
         if (token.type is not TokenType.IDENTIFIER)
         {
-            throw new FormatException($"Token type of \"{TokenType.IDENTIFIER}\" was expected. But got token type of \"{token.type}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.IDENTIFIER)
+                .Build();
         }
 
         WriteNode(
@@ -519,7 +631,10 @@ internal class CompilationEngine : IDisposable
         token = _jackTokenizer.CurrentToken;
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ("[" or "="))
         {
-            throw new FormatException($"Token type of \"{TokenType.SYMBOL}\", with the value of \"[\" or \"=\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "[", "=")
+                .Build();
         }
 
         WriteNode(
@@ -535,7 +650,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ("]" or ";"))
         {
-            throw new FormatException($"Token type of \"{TokenType.SYMBOL}\", with the value of \"]\" or \";\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "]", ";")
+                .Build();
         }
         else if (_jackTokenizer.GetSymbol() is "]")
         {
@@ -550,7 +668,10 @@ internal class CompilationEngine : IDisposable
 
             if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "=")
             {
-                throw new FormatException($"Token type of \"{TokenType.SYMBOL}\" with the value of \"=\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+                throw new FormatExceptionBuilder()
+                    .AddUnexpected(token.type, token.rawValue)
+                    .AddExpected(TokenType.SYMBOL, "=")
+                    .Build();
             }
 
             WriteNode(
@@ -567,7 +688,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
         {
-            throw new FormatException($"Token type of \"{TokenType.SYMBOL}\" with the value of \";\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, ";")
+                .Build();
         }
 
         WriteNode(
@@ -587,7 +711,10 @@ internal class CompilationEngine : IDisposable
 
         if(token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.IF)
         {
-            throw new FormatException($"Expected token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.IF}\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.KEYWORD, Keyword.IF)
+                .Build();
         }
 
         WriteNode(
@@ -601,7 +728,10 @@ internal class CompilationEngine : IDisposable
 
         if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "(")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"(\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "(")
+                .Build();
         }
 
         WriteNode(
@@ -617,7 +747,10 @@ internal class CompilationEngine : IDisposable
 
         if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ")")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \")\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, ")")
+                .Build();
         }
 
         WriteNode(
@@ -629,7 +762,10 @@ internal class CompilationEngine : IDisposable
 
         if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"{{\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "{")
+                .Build();
         }
 
         WriteNode(
@@ -645,7 +781,10 @@ internal class CompilationEngine : IDisposable
 
         if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"}}\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "}")
+                .Build();
         }
 
         WriteNode(
@@ -670,7 +809,10 @@ internal class CompilationEngine : IDisposable
 
             if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
             {
-                throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"{{\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+                throw new FormatExceptionBuilder()
+                    .AddUnexpected(token.type, token.rawValue)
+                    .AddExpected(TokenType.SYMBOL, "{")
+                    .Build();
             }
 
             WriteNode(
@@ -686,7 +828,10 @@ internal class CompilationEngine : IDisposable
 
             if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
             {
-                throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"}}\". But got token type of \"{token.type}\", with the value of \"{token.rawValue}\".");
+                throw new FormatExceptionBuilder()
+                    .AddUnexpected(token.type, token.rawValue)
+                    .AddExpected(TokenType.SYMBOL, "}")
+                    .Build();
             }
 
             WriteNode(
@@ -707,7 +852,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.WHILE)
         {
-            throw new FormatException($"Expected token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.WHILE}\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.KEYWORD, Keyword.WHILE)
+                .Build();
         }
 
         WriteNode(
@@ -721,7 +869,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "(")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"(\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "(")
+                .Build();
         }
 
         WriteNode(
@@ -737,7 +888,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ")")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \")\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, ")")
+                .Build();
         }
 
         WriteNode(
@@ -751,7 +905,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"{{\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "{")
+                .Build();
         }
 
         WriteNode(
@@ -767,7 +924,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"}}\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "}")
+                .Build();
         }
 
         WriteNode(
@@ -787,7 +947,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.KEYWORD)
         {
-            throw new FormatException($"Expected token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.DO}\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.KEYWORD, Keyword.DO)
+                .Build();
         }
 
         WriteNode(
@@ -801,7 +964,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.IDENTIFIER)
         {
-            throw new FormatException($"Expected token type of \"{TokenType.IDENTIFIER}\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.IDENTIFIER)
+                .Build();
         }
 
         WriteNode(
@@ -815,7 +981,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ("." or "("))
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \".\" or \"(\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, ".", "(")
+                .Build();
         }
 
         if (_jackTokenizer.GetSymbol() is ".")
@@ -831,7 +1000,10 @@ internal class CompilationEngine : IDisposable
 
             if (token.type is not TokenType.IDENTIFIER)
             {
-                throw new FormatException($"Expected token type of \"{TokenType.IDENTIFIER}\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+                throw new FormatExceptionBuilder()
+                    .AddUnexpected(token.type, token.rawValue)
+                    .AddExpected(TokenType.IDENTIFIER)
+                    .Build();
             }
 
             WriteNode(
@@ -846,7 +1018,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "(")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \"(\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, "(")
+                .Build();
         }
 
         WriteNode(
@@ -862,7 +1037,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ")")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \")\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, ")")
+                .Build();
         }
 
         WriteNode(
@@ -876,7 +1054,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \";\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, ";")
+                .Build();
         }
 
         WriteNode(
@@ -896,7 +1077,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.RETURN)
         {
-            throw new FormatException($"Expected token type of \"{TokenType.KEYWORD}\" with the value of \"{Keyword.RETURN}\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.KEYWORD, Keyword.RETURN)
+                .Build();
         }
 
         WriteNode(
@@ -916,7 +1100,10 @@ internal class CompilationEngine : IDisposable
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
         {
-            throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \";\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.rawValue)
+                .AddExpected(TokenType.SYMBOL, ";")
+                .Build();
         }
 
         WriteNode(
@@ -1005,7 +1192,10 @@ internal class CompilationEngine : IDisposable
 
                     if (token.type is not TokenType.SYMBOL && _jackTokenizer.GetSymbol() is not "]")
                     {
-                        throw new FormatException($"Token type of \"{TokenType.SYMBOL}\" with the value of \"]\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+                        throw new FormatExceptionBuilder()
+                            .AddUnexpected(token.type, token.rawValue)
+                            .AddExpected(TokenType.SYMBOL, "]")
+                            .Build();
                     }
 
                     WriteNode(
@@ -1032,7 +1222,10 @@ internal class CompilationEngine : IDisposable
 
                     if (token.type is not TokenType.SYMBOL && _jackTokenizer.GetSymbol() is not ")")
                     {
-                        throw new FormatException($"Token type of \"{TokenType.SYMBOL}\" with the value of \")\" was expected. But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+                        throw new FormatExceptionBuilder()
+                            .AddUnexpected(token.type, token.rawValue)
+                            .AddExpected(TokenType.SYMBOL, ")")
+                            .Build();
                     }
 
                     WriteNode(
@@ -1075,7 +1268,10 @@ internal class CompilationEngine : IDisposable
 
                     if (token.type is not TokenType.IDENTIFIER)
                     {
-                        throw new FormatException($"Token type of \"{TokenType.IDENTIFIER}\" was expected. But got token type of \"{token.type}\".");
+                        throw new FormatExceptionBuilder()
+                            .AddUnexpected(token.type)
+                            .AddExpected(TokenType.IDENTIFIER)
+                            .Build();
                     }
 
                     WriteNode(
@@ -1099,7 +1295,10 @@ internal class CompilationEngine : IDisposable
 
                 if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ")")
                 {
-                    throw new FormatException($"Expected token type of \"{TokenType.SYMBOL}\" with the value of \")\". But got token type of \"{token.type}\" with the value of \"{token.rawValue}\".");
+                    throw new FormatExceptionBuilder()
+                        .AddUnexpected(token.type, token.rawValue)
+                        .AddExpected(TokenType.SYMBOL, ")")
+                        .Build();
                 }
 
                 WriteNode(
@@ -1111,11 +1310,14 @@ internal class CompilationEngine : IDisposable
 
                 break;
             default:
-                throw new FormatException($"Unexpected token type for the term. The token type was \"{token.type}\".");
+                throw new FormatExceptionBuilder()
+                    .AddUnexpected(token.type)
+                    .Build();
         }
 
         Write("</term>");
     }
+
     private int CompileExpressionList()
     {
         int count = 0;
@@ -1144,30 +1346,37 @@ internal class CompilationEngine : IDisposable
         Write("</expressionList>");
         return count;
     }
+
     private void Write(string message)
     {
         _outputWriter.WriteLine(message);
     }
+
     private void WriteNode(string nodeType, string value)
     {
         _outputWriter.WriteLine($"<{nodeType}> {value} </{nodeType}>");
     }
+
     private static bool IsPrimitiveType(Keyword keyword)
     {
         return keyword is Keyword.INT or Keyword.BOOLEAN or Keyword.CHAR;
     }
+
     private static bool IsStatementKeyword(Keyword keyword)
     {
         return keyword is Keyword.LET or Keyword.IF or Keyword.WHILE or Keyword.DO or Keyword.RETURN;
     }
+
     private static bool IsKeywordConstant(Keyword keyword)
     {
         return keyword is Keyword.TRUE or Keyword.FALSE or Keyword.NULL or Keyword.THIS;
     }
+
     private static bool IsValidOperator(string op)
     {
         return op is "+" or "-" or "*" or "/" or "&amp;" or "|" or "&lt;" or "&gt;" or "=";
     }
+
     public void Dispose()
     {
         if (_isDisposed is false)
