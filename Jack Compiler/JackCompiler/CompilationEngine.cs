@@ -24,49 +24,41 @@ internal class CompilationEngine : IDisposable
         _jackTokenizer.Advance();
 
         (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
-        if (token.type is not TokenType.KEYWORD)
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.KEYWORD)
-                .Build();
-        }
-        else if (_jackTokenizer.GetKeyword() is not Keyword.CLASS)
+
+        if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.CLASS)
         {
             throw new FormatExceptionBuilder()
                 .AddUnexpected(token.type, token.rawValue)
                 .AddExpected(TokenType.KEYWORD, Keyword.CLASS)
                 .Build();
         }
-        else
-        {
-            WriteNode(
-                TokenType.KEYWORD.ToLowerString(),
-                _jackTokenizer.GetKeyword().ToLowerString()
-            );
 
-            _jackTokenizer.Advance();
-        }
+        WriteNode(
+            TokenType.KEYWORD.ToLowerString(),
+            _jackTokenizer.GetKeyword().ToLowerString()
+        );
+
+        _jackTokenizer.Advance();
 
         token = _jackTokenizer.CurrentToken;
+
         if (token.type is not TokenType.IDENTIFIER)
         {
             throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
+                .AddUnexpected(token.type)
                 .AddExpected(TokenType.IDENTIFIER)
                 .Build();
         }
-        else
-        {
-            WriteNode(
-                TokenType.IDENTIFIER.ToLowerString(),
-                _jackTokenizer.GetIdentifier()
-            );
 
-            _jackTokenizer.Advance();
-        }
+        WriteNode(
+            TokenType.IDENTIFIER.ToLowerString(),
+            _jackTokenizer.GetIdentifier()
+        );
+
+        _jackTokenizer.Advance();
 
         token = _jackTokenizer.CurrentToken;
+
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
         {
             throw new FormatExceptionBuilder()
@@ -74,25 +66,23 @@ internal class CompilationEngine : IDisposable
                 .AddExpected(TokenType.SYMBOL, "{")
                 .Build();
         }
-        else
-        {
-            WriteNode(
-                TokenType.SYMBOL.ToLowerString(),
-                _jackTokenizer.GetSymbol()
-            );
 
-            _jackTokenizer.Advance();
-        }
+        WriteNode(
+            TokenType.SYMBOL.ToLowerString(),
+            _jackTokenizer.GetSymbol()
+        );
+
+        _jackTokenizer.Advance();
 
         token = _jackTokenizer.CurrentToken;
-        while (token.type is TokenType.KEYWORD && (_jackTokenizer.GetKeyword() is Keyword.STATIC or Keyword.FIELD))
+
+        while (token.type is TokenType.KEYWORD && _jackTokenizer.GetKeyword().IsClassVarDec())
         {
             CompileClassVarDec();
-            _jackTokenizer.Advance();
             token = _jackTokenizer.CurrentToken;
         }
 
-        while (token.type is TokenType.KEYWORD && (_jackTokenizer.GetKeyword() is Keyword.FUNCTION or Keyword.CONSTRUCTOR or Keyword.METHOD))
+        while (token.type is TokenType.KEYWORD && _jackTokenizer.GetKeyword().IsSubroutineDec())
         {
             CompileSubroutine();
             token = _jackTokenizer.CurrentToken;
@@ -105,13 +95,11 @@ internal class CompilationEngine : IDisposable
                 .AddExpected(TokenType.SYMBOL, "}")
                 .Build();
         }
-        else
-        {
-            WriteNode(
-                TokenType.SYMBOL.ToLowerString(),
-                _jackTokenizer.GetSymbol()
-            );
-        }
+
+        WriteNode(
+            TokenType.SYMBOL.ToLowerString(),
+            _jackTokenizer.GetSymbol()
+        );
 
         Write("</class>");
     }
@@ -216,6 +204,7 @@ internal class CompilationEngine : IDisposable
                 TokenType.SYMBOL.ToLowerString(),
                 _jackTokenizer.GetSymbol()
             );
+            _jackTokenizer.Advance();
         }
 
         Write("</classVarDec>");
