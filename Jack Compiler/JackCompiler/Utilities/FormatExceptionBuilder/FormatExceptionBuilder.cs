@@ -53,25 +53,6 @@ internal class FormatExceptionBuilder
         return this;
     }
 
-    public FormatExceptionBuilder AddExpected(TokenType[] tokenTypes, params string[] values)
-    {
-        foreach(TokenType type in tokenTypes)
-        {
-            AddExpected(type);
-        }
-
-        string message = $"Expected value of \"{values[0]}\"";
-
-        for(int i = 1; i < values.Length; i ++)
-        {
-            message += $", or \"{values[i]}\"";
-        }
-
-        _errorMessages.Add(message + ".");
-
-        return this;
-    }
-
     public FormatException Build()
     {
         var exception = new FormatException(string.Join(" ", _errorMessages));
