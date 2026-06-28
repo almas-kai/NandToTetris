@@ -33,7 +33,7 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.OPENING_BRACE]
+            expectedValues: [Symbol.OPENING_BRACE]
         );
 
         ConsumeWhile(
@@ -49,7 +49,7 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.CLOSING_BRACE],
+            expectedValues: [Symbol.CLOSING_BRACE],
             isStartWithAdvance: false
         );
 
@@ -87,7 +87,7 @@ internal class CompilationEngine : IDisposable
             _jackTokenizer.Advance();
             token = _jackTokenizer.CurrentToken;
 
-            if (token.type == TokenType.SYMBOL && token.value is Symbols.COMMA)
+            if (token.type == TokenType.SYMBOL && token.value is Symbol.COMMA)
             {
                 WriteNode(
                     token.type.ToLowerString(),
@@ -101,7 +101,7 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.SEMICOLON],
+            expectedValues: [Symbol.SEMICOLON],
             isStartWithAdvance: false
         );
 
@@ -136,14 +136,14 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.OPENING_PARENTHESIS]
+            expectedValues: [Symbol.OPENING_PARENTHESIS]
         );
 
         CompileParameterList();
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.CLOSING_PARENTHESIS],
+            expectedValues: [Symbol.CLOSING_PARENTHESIS],
             isStartWithAdvance: false
         );
 
@@ -194,7 +194,7 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.OPENING_BRACE]
+            expectedValues: [Symbol.OPENING_BRACE]
         );
 
         ConsumeWhile(
@@ -211,7 +211,7 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.CLOSING_BRACE],
+            expectedValues: [Symbol.CLOSING_BRACE],
             isStartWithAdvance: false
         );
 
@@ -248,7 +248,7 @@ internal class CompilationEngine : IDisposable
             _jackTokenizer.Advance();
             token = _jackTokenizer.CurrentToken;
 
-            if (token.type is TokenType.SYMBOL && token.value is Symbols.COMMA)
+            if (token.type is TokenType.SYMBOL && token.value is Symbol.COMMA)
             {
                 WriteNode(
                     token.type.ToLowerString(),
@@ -261,7 +261,7 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.SEMICOLON],
+            expectedValues: [Symbol.SEMICOLON],
             isStartWithAdvance: false
         );
 
@@ -329,8 +329,8 @@ internal class CompilationEngine : IDisposable
         Consume(
             expectedNodeType: TokenType.SYMBOL,
             expectedValues: [
-                Symbols.OPENING_BRACKET,
-                Symbols.EQUAL
+                Symbol.OPENING_BRACKET,
+                Symbol.EQUAL
             ]
         );
 
@@ -358,7 +358,7 @@ internal class CompilationEngine : IDisposable
 
             Consume(
                 expectedNodeType: TokenType.SYMBOL,
-                expectedValues: [Symbols.EQUAL]
+                expectedValues: [Symbol.EQUAL]
             );
 
             _jackTokenizer.Advance();
@@ -368,7 +368,7 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.SEMICOLON],
+            expectedValues: [Symbol.SEMICOLON],
             isStartWithAdvance: false
         );
 
@@ -388,7 +388,7 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.OPENING_PARENTHESIS]
+            expectedValues: [Symbol.OPENING_PARENTHESIS]
         );
 
         _jackTokenizer.Advance();
@@ -397,13 +397,13 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.CLOSING_PARENTHESIS],
+            expectedValues: [Symbol.CLOSING_PARENTHESIS],
             isStartWithAdvance: false
         );
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.OPENING_BRACE]
+            expectedValues: [Symbol.OPENING_BRACE]
         );
 
         _jackTokenizer.Advance();
@@ -412,7 +412,7 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.CLOSING_BRACE],
+            expectedValues: [Symbol.CLOSING_BRACE],
             isStartWithAdvance: false
         );
 
@@ -429,7 +429,7 @@ internal class CompilationEngine : IDisposable
 
             Consume(
                 expectedNodeType: TokenType.SYMBOL,
-                expectedValues: [Symbols.OPENING_BRACE]
+                expectedValues: [Symbol.OPENING_BRACE]
             );
 
             _jackTokenizer.Advance();
@@ -459,7 +459,7 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.OPENING_PARENTHESIS]
+            expectedValues: [Symbol.OPENING_PARENTHESIS]
         );
 
         _jackTokenizer.Advance();
@@ -468,13 +468,13 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.CLOSING_PARENTHESIS],
+            expectedValues: [Symbol.CLOSING_PARENTHESIS],
             isStartWithAdvance: false
         );
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.OPENING_BRACE]
+            expectedValues: [Symbol.OPENING_BRACE]
         );
 
         _jackTokenizer.Advance();
@@ -483,7 +483,7 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.CLOSING_BRACE],
+            expectedValues: [Symbol.CLOSING_BRACE],
             isStartWithAdvance: false
         );
 
@@ -505,11 +505,11 @@ internal class CompilationEngine : IDisposable
             expectedNodeType: TokenType.IDENTIFIER
         );
 
-        if (_jackTokenizer.Peek().value is Symbols.DOT)
+        if (_jackTokenizer.Peek().value is Symbol.DOT)
         {
             Consume(
                 expectedNodeType: TokenType.SYMBOL,
-                expectedValues: [Symbols.DOT]
+                expectedValues: [Symbol.DOT]
             );
 
             Consume(
@@ -519,7 +519,7 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.OPENING_PARENTHESIS]
+            expectedValues: [Symbol.OPENING_PARENTHESIS]
         );
 
         _jackTokenizer.Advance();
@@ -528,13 +528,13 @@ internal class CompilationEngine : IDisposable
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.CLOSING_PARENTHESIS],
+            expectedValues: [Symbol.CLOSING_PARENTHESIS],
             isStartWithAdvance: false
         );
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.SEMICOLON]
+            expectedValues: [Symbol.SEMICOLON]
         );
 
         _jackTokenizer.Advance();
@@ -555,14 +555,14 @@ internal class CompilationEngine : IDisposable
 
         (TokenType type, string value) token = _jackTokenizer.CurrentToken;
 
-        if (token.type is not TokenType.SYMBOL || token.value is not Symbols.SEMICOLON)
+        if (token.type is not TokenType.SYMBOL || token.value is not Symbol.SEMICOLON)
         {
             CompileExpression();
         }
 
         Consume(
             expectedNodeType: TokenType.SYMBOL,
-            expectedValues: [Symbols.SEMICOLON],
+            expectedValues: [Symbol.SEMICOLON],
             isStartWithAdvance: false
         );
 
@@ -584,7 +584,7 @@ internal class CompilationEngine : IDisposable
             (TokenType type, string value) token = _jackTokenizer.CurrentToken;
 
             // Remove GetSymbol, rework the tokenizer.
-            if (token.type is TokenType.SYMBOL && Symbols.IsValidOperator(_jackTokenizer.GetSymbol()))
+            if (token.type is TokenType.SYMBOL && Symbol.IsValidOperator(_jackTokenizer.GetSymbol()))
             {
                 WriteNode(
                     TokenType.SYMBOL.ToLowerString(),
@@ -624,7 +624,7 @@ internal class CompilationEngine : IDisposable
                 );
                 _jackTokenizer.Advance();
                 break;
-            case TokenType.IDENTIFIER when !(_jackTokenizer.Peek().type is TokenType.SYMBOL && _jackTokenizer.Peek().value is Symbols.DOT or Symbols.OPENING_PARENTHESIS):
+            case TokenType.IDENTIFIER when !(_jackTokenizer.Peek().type is TokenType.SYMBOL && _jackTokenizer.Peek().value is Symbol.DOT or Symbol.OPENING_PARENTHESIS):
                 WriteNode(
                     TokenType.IDENTIFIER.ToLowerString(),
                     _jackTokenizer.GetIdentifier()
@@ -634,7 +634,7 @@ internal class CompilationEngine : IDisposable
 
                 token = _jackTokenizer.CurrentToken;
 
-                if (token.type is TokenType.SYMBOL && token.value is Symbols.OPENING_BRACKET)
+                if (token.type is TokenType.SYMBOL && token.value is Symbol.OPENING_BRACKET)
                 {
                     WriteNode(
                         TokenType.SYMBOL.ToLowerString(),
@@ -647,15 +647,15 @@ internal class CompilationEngine : IDisposable
 
                     Consume(
                         expectedNodeType: TokenType.SYMBOL,
-                        expectedValues: [Symbols.CLOSING_BRACKET],
+                        expectedValues: [Symbol.CLOSING_BRACKET],
                         isStartWithAdvance: false
                     );
 
                     _jackTokenizer.Advance();
                 }
                 break;
-            case TokenType.SYMBOL when _jackTokenizer.GetSymbol() is Symbols.OPENING_PARENTHESIS or Symbols.MINUS or Symbols.TILDE:
-                if (_jackTokenizer.GetSymbol() is Symbols.OPENING_PARENTHESIS)
+            case TokenType.SYMBOL when _jackTokenizer.GetSymbol() is Symbol.OPENING_PARENTHESIS or Symbol.MINUS or Symbol.TILDE:
+                if (_jackTokenizer.GetSymbol() is Symbol.OPENING_PARENTHESIS)
                 {
                     WriteNode(
                         TokenType.SYMBOL.ToLowerString(),
@@ -668,7 +668,7 @@ internal class CompilationEngine : IDisposable
 
                     Consume(
                         expectedNodeType: TokenType.SYMBOL,
-                        expectedValues: [Symbols.CLOSING_PARENTHESIS],
+                        expectedValues: [Symbol.CLOSING_PARENTHESIS],
                         isStartWithAdvance: false
                     );
 
@@ -686,7 +686,7 @@ internal class CompilationEngine : IDisposable
                     CompileTerm();
                 }
                 break;
-            case TokenType.IDENTIFIER when _jackTokenizer.Peek().type is TokenType.SYMBOL && _jackTokenizer.Peek().value is Symbols.DOT or Symbols.OPENING_PARENTHESIS:
+            case TokenType.IDENTIFIER when _jackTokenizer.Peek().type is TokenType.SYMBOL && _jackTokenizer.Peek().value is Symbol.DOT or Symbol.OPENING_PARENTHESIS:
                 WriteNode(
                     TokenType.IDENTIFIER.ToLowerString(),
                     _jackTokenizer.GetIdentifier()
@@ -696,7 +696,7 @@ internal class CompilationEngine : IDisposable
 
                 token = _jackTokenizer.CurrentToken;
 
-                if (token.value is Symbols.DOT)
+                if (token.value is Symbol.DOT)
                 {
                     WriteNode(
                         TokenType.SYMBOL.ToLowerString(),
@@ -721,7 +721,7 @@ internal class CompilationEngine : IDisposable
 
                 Consume(
                     expectedNodeType: TokenType.SYMBOL,
-                    expectedValues: [Symbols.CLOSING_PARENTHESIS],
+                    expectedValues: [Symbol.CLOSING_PARENTHESIS],
                     isStartWithAdvance: false
                 );
 
@@ -743,13 +743,13 @@ internal class CompilationEngine : IDisposable
         Write("<expressionList>");
 
         (TokenType type, string value) token = _jackTokenizer.CurrentToken;
-        while (token.type is not TokenType.SYMBOL || token.value is not Symbols.CLOSING_PARENTHESIS)
+        while (token.type is not TokenType.SYMBOL || token.value is not Symbol.CLOSING_PARENTHESIS)
         {
             count ++;
             CompileExpression();
 
             token = _jackTokenizer.CurrentToken;
-            if (token.type is TokenType.SYMBOL && token.value is Symbols.COMMA)
+            if (token.type is TokenType.SYMBOL && token.value is Symbol.COMMA)
             {
                 WriteNode(
                     TokenType.SYMBOL.ToLowerString(),

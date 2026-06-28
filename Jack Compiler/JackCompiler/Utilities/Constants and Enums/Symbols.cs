@@ -1,7 +1,6 @@
 namespace JackCompiler.Utilities.ConstantsAndEnums;
 
-// Don't forget to rename it to Symbol.
-internal static class Symbols
+internal static class Symbol
 {
     public const string OPENING_BRACE = "{";
     public const string CLOSING_BRACE = "}";
