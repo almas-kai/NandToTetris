@@ -7,4 +7,4 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Usage", "MSTEST0014:DataRow should be valid", Justification = "<Pending>", Scope = "member", Target = "~M:JackCompilerTests.JackTokenizerTests.Peek_UsingPeekOnArrayTestFiles_WorksAsExpected(System.Int32,System.Int32,System.String)")]
 [assembly: SuppressMessage("Usage", "MSTEST0014:DataRow should be valid", Justification = "<Pending>", Scope = "member", Target = "~M:JackCompilerTests.UtilitiesTests.CompilerRegexTests.RemoveAllComments.PassingCodeWithoutComments_ReturnsOriginalString(System.String)")]
-[assembly: Parallelize(Scope = ExecutionScope.MethodLevel)]
+[assembly: Parallelize(Scope = ExecutionScope.ClassLevel)]

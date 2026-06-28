@@ -19,11 +19,11 @@ internal static class TXMLGenerator
             while (jackTokenizer.HasMoreTokens)
             {
                 jackTokenizer.Advance();
-                TokenType type = jackTokenizer.CurrentToken.Type;
-                switch (type)
+                (TokenType type, string value) token = jackTokenizer.CurrentToken;
+                switch (token.type)
                 {
                     case TokenType.KEYWORD:
-                        writer.WriteLine($"<keyword> {jackTokenizer.GetKeyword().ToLowerString()} </keyword>");
+                        writer.WriteLine($"<keyword> {token.value} </keyword>");
                         break;
                     case TokenType.SYMBOL:
                         writer.WriteLine($"<symbol> {jackTokenizer.GetSymbol()} </symbol>");
@@ -38,7 +38,7 @@ internal static class TXMLGenerator
                         writer.WriteLine($"<stringConstant> {jackTokenizer.GetString()} </stringConstant>");
                         break;
                     default:
-                        throw new FormatException($"Cannot generate testing XML file. Unrecognized token type: \"{type}\".");
+                        throw new FormatException($"Cannot generate testing XML file. Unrecognized token type: \"{token.type}\".");
                 }
             }
             writer.WriteLine("</tokens>");

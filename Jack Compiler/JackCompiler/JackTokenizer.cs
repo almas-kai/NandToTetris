@@ -58,26 +58,6 @@ internal class JackTokenizer
             throw new InvalidOperationException($"Couldn't match the token. Unrecognized token type. Token type is: \"{token.type}\", token value is: \"{token.value}\".");
         }
     }
-    public Keyword GetKeyword()
-    {
-        if (CurrentToken.Type is not TokenType.KEYWORD)
-        {
-            throw new InvalidOperationException($"Cannot get the keyword, token type is not keyword. The token type is \"{CurrentToken.Type}\".");
-        }
-
-        bool isValidKeyword = Enum.TryParse<Keyword>(
-          value: CurrentToken.RawValue,
-          ignoreCase: true,
-          result: out Keyword keyword
-        );
-
-        if (!isValidKeyword)
-        {
-            throw new InvalidOperationException($"Unrecognized keyword: \"{CurrentToken.RawValue}\".");
-        }
-
-        return keyword;
-    }
     public string GetSymbol()
     {
         if (CurrentToken.Type is not TokenType.SYMBOL || CurrentToken.RawValue.Length != 1)

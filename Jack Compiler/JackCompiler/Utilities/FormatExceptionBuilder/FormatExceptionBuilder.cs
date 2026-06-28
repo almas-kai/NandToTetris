@@ -1,5 +1,3 @@
-using System.Text;
-
 using JackCompiler.Utilities.ConstantsAndEnums;
 
 namespace JackCompiler.Utilities;
@@ -42,6 +40,7 @@ internal class FormatExceptionBuilder
     public FormatExceptionBuilder AddExpected(TokenType tokenType, params string[] values)
     {
         AddExpected(tokenType);
+
         string message = $"Expected value of \"{values[0]}\"";
 
         for(int i = 1; i < values.Length; i ++)
@@ -54,13 +53,21 @@ internal class FormatExceptionBuilder
         return this;
     }
 
-    public FormatExceptionBuilder AddExpected(TokenType tokenType, params Keyword[] value)
+    public FormatExceptionBuilder AddExpected(TokenType[] tokenTypes, params string[] values)
     {
-        AddExpected(
-            tokenType,
-            value.Select((keyword) => keyword.ToLowerString())
-                .ToArray()
-        );
+        foreach(TokenType type in tokenTypes)
+        {
+            AddExpected(type);
+        }
+
+        string message = $"Expected value of \"{values[0]}\"";
+
+        for(int i = 1; i < values.Length; i ++)
+        {
+            message += $", or \"{values[i]}\"";
+        }
+
+        _errorMessages.Add(message + ".");
 
         return this;
     }

@@ -9,6 +9,7 @@ internal class CompilationEngine : IDisposable
     private readonly string _outputFileName;
     private readonly StreamWriter _outputWriter;
     private bool _isDisposed;
+
     public CompilationEngine(JackTokenizer jackTokenizer, string outputFileName)
     {
         _jackTokenizer = jackTokenizer;
@@ -21,84 +22,35 @@ internal class CompilationEngine : IDisposable
     {
         Write("<class>");
 
-        _jackTokenizer.Advance();
-
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.CLASS)
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.KEYWORD, Keyword.CLASS)
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.KEYWORD.ToLowerString(),
-            _jackTokenizer.GetKeyword().ToLowerString()
+        Consume(
+            expectedNodeType: TokenType.KEYWORD,
+            expectedValues: [Keyword.CLASS]
         );
 
-        _jackTokenizer.Advance();
-
-        token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.IDENTIFIER)
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type)
-                .AddExpected(TokenType.IDENTIFIER)
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.IDENTIFIER.ToLowerString(),
-            _jackTokenizer.GetIdentifier()
+        Consume(
+            expectedNodeType: TokenType.IDENTIFIER
         );
 
-        _jackTokenizer.Advance();
-
-        token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, "{")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.OPENING_BRACE]
         );
 
-        _jackTokenizer.Advance();
+        ConsumeWhile(
+            predicate: (TokenType type, string value) => type is TokenType.KEYWORD && Keyword.IsClassVarDec(value),
+            action: CompileClassVarDec
+        );
 
-        token = _jackTokenizer.CurrentToken;
+        ConsumeWhile(
+            predicate: (TokenType type, string value) => type is TokenType.KEYWORD && Keyword.IsSubroutineDec(value),
+            action: CompileSubroutine,
+            isStartWithAdvance: false
+        );
 
-        while (token.type is TokenType.KEYWORD && _jackTokenizer.GetKeyword().IsClassVarDec())
-        {
-            CompileClassVarDec();
-            token = _jackTokenizer.CurrentToken;
-        }
-
-        while (token.type is TokenType.KEYWORD && _jackTokenizer.GetKeyword().IsSubroutineDec())
-        {
-            CompileSubroutine();
-            token = _jackTokenizer.CurrentToken;
-        }
-
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, "}")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.CLOSING_BRACE],
+            isStartWithAdvance: false
         );
 
         Write("</class>");
@@ -107,68 +59,24 @@ internal class CompilationEngine : IDisposable
     {
         Write("<classVarDec>");
 
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
-        if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not (Keyword.FIELD or Keyword.STATIC))
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.KEYWORD, [
-                    Keyword.FIELD,
-                    Keyword.STATIC
-                ])
-                .Build();
-        }
-        else
-        {
-            WriteNode(
-                TokenType.KEYWORD.ToLowerString(),
-                _jackTokenizer.GetKeyword().ToLowerString()
-            );
+        Consume(
+            expectedNodeType: TokenType.KEYWORD,
+            expectedValues: [Keyword.FIELD, Keyword.STATIC],
+            isStartWithAdvance: false
+        );
 
-            _jackTokenizer.Advance();
-        }
+        ConsumeIdentifierOrKeyword(
+            expectedKeywords: [
+                Keyword.INT,
+                Keyword.BOOLEAN,
+                Keyword.CHAR
+            ]
+        );
 
-        token = _jackTokenizer.CurrentToken;
-        if (token.type is not (TokenType.KEYWORD or TokenType.IDENTIFIER))
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.KEYWORD)
-                .AddExpected(TokenType.IDENTIFIER)
-                .Build();
-        }
-        else if (token.type is TokenType.KEYWORD)
-        {
-            if (IsPrimitiveType(_jackTokenizer.GetKeyword()) is false)
-            {
-                throw new FormatExceptionBuilder()
-                    .AddUnexpected(token.type, token.rawValue)
-                    .AddExpected(TokenType.KEYWORD, [
-                        Keyword.INT,
-                        Keyword.BOOLEAN,
-                        Keyword.CHAR
-                    ])
-                    .Build();
-            }
+        // This part is weird.
+        _jackTokenizer.Advance();
+        (TokenType type, string value) token = _jackTokenizer.CurrentToken;
 
-            WriteNode(
-                TokenType.KEYWORD.ToLowerString(),
-                _jackTokenizer.GetKeyword().ToLowerString()
-            );
-
-            _jackTokenizer.Advance();
-        }
-        else
-        {
-            WriteNode(
-                TokenType.IDENTIFIER.ToLowerString(),
-                _jackTokenizer.GetIdentifier()
-            );
-
-            _jackTokenizer.Advance();
-        }
-
-        token = _jackTokenizer.CurrentToken;
         while (token.type is TokenType.IDENTIFIER)
         {
             WriteNode(
@@ -177,13 +85,13 @@ internal class CompilationEngine : IDisposable
             );
 
             _jackTokenizer.Advance();
-
             token = _jackTokenizer.CurrentToken;
-            if (token.type == TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
+
+            if (token.type == TokenType.SYMBOL && token.value is Symbols.COMMA)
             {
                 WriteNode(
-                    TokenType.SYMBOL.ToLowerString(),
-                    _jackTokenizer.GetSymbol()
+                    token.type.ToLowerString(),
+                    token.value
                 );
 
                 _jackTokenizer.Advance();
@@ -191,163 +99,55 @@ internal class CompilationEngine : IDisposable
             }
         }
 
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, ";")
-                .Build();
-        }
-        else
-        {
-            WriteNode(
-                TokenType.SYMBOL.ToLowerString(),
-                _jackTokenizer.GetSymbol()
-            );
-            _jackTokenizer.Advance();
-        }
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.SEMICOLON],
+            isStartWithAdvance: false
+        );
 
         Write("</classVarDec>");
     }
     private void CompileSubroutine()
     {
         Write("<subroutineDec>");
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
-        if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not (Keyword.CONSTRUCTOR or Keyword.FUNCTION or Keyword.METHOD))
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.KEYWORD, [
-                    Keyword.CONSTRUCTOR,
-                    Keyword.FUNCTION,
-                    Keyword.METHOD
-                ])
-                .Build();
-        }
-        else
-        {
-            WriteNode(
-                TokenType.KEYWORD.ToLowerString(),
-                _jackTokenizer.GetKeyword().ToLowerString()
-            );
-            _jackTokenizer.Advance();
-        }
 
-        token = _jackTokenizer.CurrentToken;
-        if (token.type is not (TokenType.KEYWORD or TokenType.IDENTIFIER))
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.KEYWORD)
-                .AddExpected(TokenType.IDENTIFIER)
-                .Build();
-        }
-        else if (token.type is TokenType.KEYWORD)
-        {
-            if (_jackTokenizer.GetKeyword() is not Keyword.VOID && IsPrimitiveType(_jackTokenizer.GetKeyword()) is false)
-            {
-                throw new FormatExceptionBuilder()
-                    .AddUnexpected(token.type, token.rawValue)
-                    .AddExpected(TokenType.KEYWORD, [
-                        Keyword.INT,
-                        Keyword.BOOLEAN,
-                        Keyword.CHAR,
-                        Keyword.VOID
-                    ])
-                    .Build();
-            }
+        Consume(
+            expectedNodeType: TokenType.KEYWORD,
+            expectedValues: [
+                Keyword.CONSTRUCTOR,
+                Keyword.FUNCTION,
+                Keyword.METHOD
+            ],
+            isStartWithAdvance: false
+        );
 
-            WriteNode(
-                TokenType.KEYWORD.ToLowerString(),
-                _jackTokenizer.GetKeyword().ToLowerString()
-            );
+        ConsumeIdentifierOrKeyword(
+            expectedKeywords: [
+                Keyword.INT,
+                Keyword.BOOLEAN,
+                Keyword.CHAR,
+                Keyword.VOID
+            ]
+        );
 
-            _jackTokenizer.Advance();
-        }
-        else
-        {
-            WriteNode(
-                TokenType.IDENTIFIER.ToLowerString(),
-                _jackTokenizer.GetIdentifier()
-            );
+        Consume(
+            expectedNodeType: TokenType.IDENTIFIER
+        );
 
-            _jackTokenizer.Advance();
-        }
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.OPENING_PARENTHESIS]
+        );
 
-        token = _jackTokenizer.CurrentToken;
-        if (token.type is not TokenType.IDENTIFIER)
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.IDENTIFIER)
-                .Build();
-        }
-        else
-        {
-            WriteNode(
-                TokenType.IDENTIFIER.ToLowerString(),
-                _jackTokenizer.GetIdentifier()
-            );
+        CompileParameterList();
 
-            _jackTokenizer.Advance();
-        }
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.CLOSING_PARENTHESIS],
+            isStartWithAdvance: false
+        );
 
-        token = _jackTokenizer.CurrentToken;
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "(")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, "(")
-                .Build();
-        }
-        else
-        {
-            WriteNode(
-                TokenType.SYMBOL.ToLowerString(),
-                _jackTokenizer.GetSymbol()
-            );
-
-            _jackTokenizer.Advance();
-
-            CompileParameterList();
-
-            if (token.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ")")
-            {
-                WriteNode(
-                    TokenType.SYMBOL.ToLowerString(),
-                    _jackTokenizer.GetSymbol()
-                );
-
-                _jackTokenizer.Advance();
-            }
-            else
-            {
-                throw new FormatExceptionBuilder()
-                    .AddUnexpected(token.type, token.rawValue)
-                    .AddExpected(TokenType.SYMBOL, ")")
-                    .Build();
-            }
-
-            if (token.type is not TokenType.SYMBOL)
-            {
-                throw new FormatExceptionBuilder()
-                    .AddUnexpected(token.type, token.rawValue)
-                    .AddExpected(TokenType.SYMBOL)
-                    .Build();
-            }
-            else
-            {
-                if (_jackTokenizer.GetSymbol() is not "{")
-                {
-                    throw new FormatExceptionBuilder()
-                        .AddUnexpected(token.type, token.rawValue)
-                        .AddExpected(TokenType.SYMBOL, "{")
-                        .Build();
-                }
-
-                CompileSubroutineBody();
-            }
-        }
+        CompileSubroutineBody();
 
         Write("</subroutineDec>");
     }
@@ -355,35 +155,20 @@ internal class CompilationEngine : IDisposable
     {
         Write("<parameterList>");
 
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
+        _jackTokenizer.Advance();
+
+        // Again need to rework this loop as well.
+        (TokenType type, string value) token = _jackTokenizer.CurrentToken;
         while (token.type is TokenType.KEYWORD or TokenType.IDENTIFIER)
         {
-            if (token.type is TokenType.KEYWORD)
-            {
-                if (IsPrimitiveType(_jackTokenizer.GetKeyword()) is false)
-                {
-                    throw new FormatExceptionBuilder()
-                        .AddUnexpected(token.type, token.rawValue)
-                        .AddExpected(TokenType.KEYWORD, [
-                            Keyword.INT,
-                            Keyword.BOOLEAN,
-                            Keyword.CHAR
-                        ])
-                        .Build();
-                }
-
-                WriteNode(
-                    TokenType.KEYWORD.ToLowerString(),
-                    _jackTokenizer.GetKeyword().ToLowerString()
-                );
-            }
-            else
-            {
-                WriteNode(
-                    TokenType.IDENTIFIER.ToLowerString(),
-                    _jackTokenizer.GetIdentifier()
-                );
-            }
+            ConsumeIdentifierOrKeyword(
+                expectedKeywords: [
+                    Keyword.INT,
+                    Keyword.BOOLEAN,
+                    Keyword.CHAR
+                ],
+                isStartWithAdvance: false
+            );
 
             _jackTokenizer.Advance();
 
@@ -391,9 +176,10 @@ internal class CompilationEngine : IDisposable
 
             if (token.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
             {
+                // You could give out token itself here.
                 WriteNode(
-                    TokenType.SYMBOL.ToLowerString(),
-                    _jackTokenizer.GetSymbol()
+                    token.type.ToLowerString(),
+                    token.value
                 );
                 _jackTokenizer.Advance();
                 token = _jackTokenizer.CurrentToken;
@@ -406,47 +192,28 @@ internal class CompilationEngine : IDisposable
     {
         Write("<subroutineBody>");
 
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, "{")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.OPENING_BRACE]
         );
-        _jackTokenizer.Advance();
 
-        token = _jackTokenizer.CurrentToken;
-        while (token.type is TokenType.KEYWORD && _jackTokenizer.GetKeyword() is Keyword.VAR)
-        {
-            CompileVarDec();
-            token = _jackTokenizer.CurrentToken;
-        }
+        ConsumeWhile(
+            predicate: (TokenType type, string value) => type is TokenType.KEYWORD && value is Keyword.VAR,
+            action: CompileVarDec
+        );
 
-        if (token.type is TokenType.KEYWORD && IsStatementKeyword(_jackTokenizer.GetKeyword()))
+        (TokenType type, string value) token = _jackTokenizer.CurrentToken;
+
+        if (token.type is TokenType.KEYWORD && Keyword.IsStatementKeyword(token.value))
         {
             CompileStatements();
-            token = _jackTokenizer.CurrentToken;
         }
 
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, "}")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.CLOSING_BRACE],
+            isStartWithAdvance: false
         );
-        _jackTokenizer.Advance();
 
         Write("</subroutineBody>");
     }
@@ -454,66 +221,37 @@ internal class CompilationEngine : IDisposable
     {
         Write("<varDec>");
 
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
-        if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.VAR)
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.KEYWORD, Keyword.VAR)
-                .Build();
-        }
+        Consume(
+            expectedNodeType: TokenType.KEYWORD,
+            expectedValues: [Keyword.VAR],
+            isStartWithAdvance: false
+        );
 
-        WriteNode(
-            TokenType.KEYWORD.ToLowerString(),
-            _jackTokenizer.GetKeyword().ToLowerString()
+        ConsumeIdentifierOrKeyword(
+            expectedKeywords: [
+                Keyword.INT,
+                Keyword.BOOLEAN,
+                Keyword.CHAR
+            ]
         );
 
         _jackTokenizer.Advance();
-
-        token = _jackTokenizer.CurrentToken;
-        if (token.type is TokenType.KEYWORD && IsPrimitiveType(_jackTokenizer.GetKeyword()))
-        {
-            WriteNode(
-                TokenType.KEYWORD.ToLowerString(),
-                _jackTokenizer.GetKeyword().ToLowerString()
-            );
-        }
-        else if (token.type is TokenType.IDENTIFIER)
-        {
-            WriteNode(
-                TokenType.IDENTIFIER.ToLowerString(),
-                _jackTokenizer.GetIdentifier()
-            );
-        }
-        else
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.KEYWORD, [
-                    Keyword.INT,
-                    Keyword.CHAR,
-                    Keyword.BOOLEAN
-                ])
-                .Build();
-        }
-
-        _jackTokenizer.Advance();
-        token = _jackTokenizer.CurrentToken;
-
+        (TokenType type, string value) token = _jackTokenizer.CurrentToken;
+        // Again while loop that i don't see how to extract.
         while (token.type is TokenType.IDENTIFIER)
         {
             WriteNode(
-                TokenType.IDENTIFIER.ToLowerString(),
+                token.type.ToLowerString(),
                 _jackTokenizer.GetIdentifier()
             );
 
             _jackTokenizer.Advance();
             token = _jackTokenizer.CurrentToken;
 
-            if (token.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
+            if (token.type is TokenType.SYMBOL && token.value is Symbols.COMMA)
             {
                 WriteNode(
-                    TokenType.SYMBOL.ToLowerString(),
+                    token.type.ToLowerString(),
                     _jackTokenizer.GetSymbol()
                 );
                 _jackTokenizer.Advance();
@@ -521,30 +259,23 @@ internal class CompilationEngine : IDisposable
             }
         }
 
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, ";")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.SEMICOLON],
+            isStartWithAdvance: false
         );
-        _jackTokenizer.Advance();
 
         Write("</varDec>");
     }
     private void CompileStatements()
     {
         Write("<statements>");
+        // Can we move advance here?
 
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
-        while (token.type is TokenType.KEYWORD && IsStatementKeyword(_jackTokenizer.GetKeyword()))
+        (TokenType type, string value) token = _jackTokenizer.CurrentToken;
+        while (token.type is TokenType.KEYWORD && Keyword.IsStatementKeyword(token.value))
         {
-            switch (_jackTokenizer.GetKeyword())
+            switch (token.value)
             {
                 case Keyword.LET:
                     CompileLet();
@@ -563,7 +294,7 @@ internal class CompilationEngine : IDisposable
                     break;
                 default:
                     throw new FormatExceptionBuilder()
-                        .AddUnexpected(token.type, token.rawValue)
+                        .AddUnexpected(token.type, token.value)
                         .AddExpected(
                             TokenType.KEYWORD,
                             [
@@ -585,62 +316,36 @@ internal class CompilationEngine : IDisposable
     {
         Write("<letStatement>");
 
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
-        if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.LET)
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.KEYWORD, Keyword.LET)
-                .Build();
-        }
-
-        WriteNode(
-            token.type.ToLowerString(),
-            _jackTokenizer.GetKeyword().ToLowerString()
+        Consume(
+            expectedNodeType: TokenType.KEYWORD,
+            expectedValues: [Keyword.LET],
+            isStartWithAdvance: false
         );
 
-        _jackTokenizer.Advance();
-
-        token = _jackTokenizer.CurrentToken;
-        if (token.type is not TokenType.IDENTIFIER)
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.IDENTIFIER)
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.IDENTIFIER.ToLowerString(),
-            _jackTokenizer.GetIdentifier()
+        Consume(
+            expectedNodeType: TokenType.IDENTIFIER
         );
 
-        _jackTokenizer.Advance();
-
-        token = _jackTokenizer.CurrentToken;
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ("[" or "="))
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, "[", "=")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [
+                Symbols.OPENING_BRACKET,
+                Symbols.EQUAL
+            ]
         );
 
         _jackTokenizer.Advance();
 
         CompileExpression();
 
-        token = _jackTokenizer.CurrentToken;
+        // Improve!
+
+        (TokenType type, string value) token = _jackTokenizer.CurrentToken;
 
         if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ("]" or ";"))
         {
             throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
+                .AddUnexpected(token.type, token.value)
                 .AddExpected(TokenType.SYMBOL, "]", ";")
                 .Build();
         }
@@ -651,21 +356,9 @@ internal class CompilationEngine : IDisposable
                 _jackTokenizer.GetSymbol()
             );
 
-            _jackTokenizer.Advance();
-
-            token = _jackTokenizer.CurrentToken;
-
-            if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "=")
-            {
-                throw new FormatExceptionBuilder()
-                    .AddUnexpected(token.type, token.rawValue)
-                    .AddExpected(TokenType.SYMBOL, "=")
-                    .Build();
-            }
-
-            WriteNode(
-                TokenType.SYMBOL.ToLowerString(),
-                _jackTokenizer.GetSymbol()
+            Consume(
+                expectedNodeType: TokenType.SYMBOL,
+                expectedValues: [Symbols.EQUAL]
             );
 
             _jackTokenizer.Advance();
@@ -673,19 +366,10 @@ internal class CompilationEngine : IDisposable
             CompileExpression();
         }
 
-        token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, ";")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.SEMICOLON],
+            isStartWithAdvance: false
         );
 
         _jackTokenizer.Advance();
@@ -696,136 +380,66 @@ internal class CompilationEngine : IDisposable
     {
         Write("<ifStatement>");
 
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
-
-        if(token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.IF)
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.KEYWORD, Keyword.IF)
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.KEYWORD.ToLowerString(),
-            Keyword.IF.ToLowerString()
+        Consume(
+            expectedNodeType: TokenType.KEYWORD,
+            expectedValues: [Keyword.IF],
+            isStartWithAdvance: false
         );
 
-        _jackTokenizer.Advance();
-
-        token = _jackTokenizer.CurrentToken;
-
-        if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "(")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, "(")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.OPENING_PARENTHESIS]
         );
 
         _jackTokenizer.Advance();
 
         CompileExpression();
 
-        token = _jackTokenizer.CurrentToken;
-
-        if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ")")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, ")")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.CLOSING_PARENTHESIS],
+            isStartWithAdvance: false
         );
 
-        _jackTokenizer.Advance();
-
-        if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, "{")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.OPENING_BRACE]
         );
 
         _jackTokenizer.Advance();
 
         CompileStatements();
 
-        token = _jackTokenizer.CurrentToken;
-
-        if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, "}")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.CLOSING_BRACE],
+            isStartWithAdvance: false
         );
 
         _jackTokenizer.Advance();
 
-        token = _jackTokenizer.CurrentToken;
+        (TokenType type, string value) token = _jackTokenizer.CurrentToken;
 
-        if (token.type is TokenType.KEYWORD && _jackTokenizer.GetKeyword() is Keyword.ELSE)
+        if (token.type is TokenType.KEYWORD && token.value is Keyword.ELSE)
         {
             WriteNode(
                 TokenType.KEYWORD.ToLowerString(),
-                Keyword.ELSE.ToLowerString()
+                Keyword.ELSE
             );
 
-            _jackTokenizer.Advance();
-
-            token = _jackTokenizer.CurrentToken;
-
-            if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
-            {
-                throw new FormatExceptionBuilder()
-                    .AddUnexpected(token.type, token.rawValue)
-                    .AddExpected(TokenType.SYMBOL, "{")
-                    .Build();
-            }
-
-            WriteNode(
-                TokenType.SYMBOL.ToLowerString(),
-                _jackTokenizer.GetSymbol()
+            Consume(
+                expectedNodeType: TokenType.SYMBOL,
+                expectedValues: [Symbols.OPENING_BRACE]
             );
 
             _jackTokenizer.Advance();
 
             CompileStatements();
 
-            token = _jackTokenizer.CurrentToken;
-
-            if(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
-            {
-                throw new FormatExceptionBuilder()
-                    .AddUnexpected(token.type, token.rawValue)
-                    .AddExpected(TokenType.SYMBOL, "}")
-                    .Build();
-            }
-
-            WriteNode(
-                TokenType.SYMBOL.ToLowerString(),
-                _jackTokenizer.GetSymbol()
+            Consume(
+                expectedNodeType: TokenType.SYMBOL,
+                expectedValues: ["}"],
+                isStartWithAdvance: false
             );
 
             _jackTokenizer.Advance();
@@ -837,91 +451,40 @@ internal class CompilationEngine : IDisposable
     {
         Write("<whileStatement>");
 
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.WHILE)
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.KEYWORD, Keyword.WHILE)
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.KEYWORD.ToLowerString(),
-            Keyword.WHILE.ToLowerString()
+        Consume(
+            expectedNodeType: TokenType.KEYWORD,
+            expectedValues: [Keyword.WHILE],
+            isStartWithAdvance: false
         );
 
-        _jackTokenizer.Advance();
-
-        token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "(")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, "(")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.OPENING_PARENTHESIS]
         );
 
         _jackTokenizer.Advance();
 
         CompileExpression();
 
-        token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ")")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, ")")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.CLOSING_PARENTHESIS],
+            isStartWithAdvance: false
         );
 
-        _jackTokenizer.Advance();
-
-        token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "{")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, "{")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.OPENING_BRACE]
         );
 
         _jackTokenizer.Advance();
 
         CompileStatements();
 
-        token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "}")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, "}")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.CLOSING_BRACE],
+            isStartWithAdvance: false
         );
 
         _jackTokenizer.Advance();
@@ -932,126 +495,46 @@ internal class CompilationEngine : IDisposable
     {
         Write("<doStatement>");
 
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.KEYWORD)
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.KEYWORD, Keyword.DO)
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.KEYWORD.ToLowerString(),
-            _jackTokenizer.GetKeyword().ToLowerString()
+        Consume(
+            expectedNodeType: TokenType.KEYWORD,
+            expectedValues: [Keyword.DO],
+            isStartWithAdvance: false
         );
 
-        _jackTokenizer.Advance();
-
-        token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.IDENTIFIER)
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.IDENTIFIER)
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.IDENTIFIER.ToLowerString(),
-            _jackTokenizer.GetIdentifier()
+        Consume(
+            expectedNodeType: TokenType.IDENTIFIER
         );
 
-        _jackTokenizer.Advance();
-
-        token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ("." or "("))
+        if (_jackTokenizer.Peek().value is Symbols.DOT)
         {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, ".", "(")
-                .Build();
-        }
-
-        if (_jackTokenizer.GetSymbol() is ".")
-        {
-            WriteNode(
-                TokenType.SYMBOL.ToLowerString(),
-                _jackTokenizer.GetSymbol()
+            Consume(
+                expectedNodeType: TokenType.SYMBOL,
+                expectedValues: [Symbols.DOT]
             );
 
-            _jackTokenizer.Advance();
-
-            token = _jackTokenizer.CurrentToken;
-
-            if (token.type is not TokenType.IDENTIFIER)
-            {
-                throw new FormatExceptionBuilder()
-                    .AddUnexpected(token.type, token.rawValue)
-                    .AddExpected(TokenType.IDENTIFIER)
-                    .Build();
-            }
-
-            WriteNode(
-                TokenType.IDENTIFIER.ToLowerString(),
-                _jackTokenizer.GetIdentifier()
+            Consume(
+                expectedNodeType: TokenType.IDENTIFIER
             );
-
-            _jackTokenizer.Advance();
-
-            token = _jackTokenizer.CurrentToken;
         }
 
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not "(")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, "(")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.OPENING_PARENTHESIS]
         );
 
         _jackTokenizer.Advance();
 
         CompileExpressionList();
 
-        token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ")")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, ")")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.CLOSING_PARENTHESIS],
+            isStartWithAdvance: false
         );
 
-        _jackTokenizer.Advance();
-
-        token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, ";")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.SEMICOLON]
         );
 
         _jackTokenizer.Advance();
@@ -1062,42 +545,25 @@ internal class CompilationEngine : IDisposable
     {
         Write("<returnStatement>");
 
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
-
-        if (token.type is not TokenType.KEYWORD || _jackTokenizer.GetKeyword() is not Keyword.RETURN)
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.KEYWORD, Keyword.RETURN)
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.KEYWORD.ToLowerString(),
-            Keyword.RETURN.ToLowerString()
+        Consume(
+            expectedNodeType: TokenType.KEYWORD,
+            expectedValues: [Keyword.RETURN],
+            isStartWithAdvance: false
         );
 
         _jackTokenizer.Advance();
 
-        token = _jackTokenizer.CurrentToken;
+        (TokenType type, string value) token = _jackTokenizer.CurrentToken;
 
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
+        if (token.type is not TokenType.SYMBOL || token.value is not Symbols.SEMICOLON)
         {
             CompileExpression();
-            token = _jackTokenizer.CurrentToken;
         }
 
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ";")
-        {
-            throw new FormatExceptionBuilder()
-                .AddUnexpected(token.type, token.rawValue)
-                .AddExpected(TokenType.SYMBOL, ";")
-                .Build();
-        }
-
-        WriteNode(
-            TokenType.SYMBOL.ToLowerString(),
-            _jackTokenizer.GetSymbol()
+        Consume(
+            expectedNodeType: TokenType.SYMBOL,
+            expectedValues: [Symbols.SEMICOLON],
+            isStartWithAdvance: false
         );
 
         _jackTokenizer.Advance();
@@ -1106,6 +572,7 @@ internal class CompilationEngine : IDisposable
     }
     private void CompileExpression()
     {
+        // Should compile expression call the advance for itself?
         Write("<expression>");
         
         bool isContinue = true;
@@ -1114,9 +581,10 @@ internal class CompilationEngine : IDisposable
         {
             CompileTerm();
 
-            (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
+            (TokenType type, string value) token = _jackTokenizer.CurrentToken;
 
-            if (token.type is TokenType.SYMBOL && IsValidOperator(_jackTokenizer.GetSymbol()))
+            // Remove GetSymbol, rework the tokenizer.
+            if (token.type is TokenType.SYMBOL && Symbols.IsValidOperator(_jackTokenizer.GetSymbol()))
             {
                 WriteNode(
                     TokenType.SYMBOL.ToLowerString(),
@@ -1138,25 +606,25 @@ internal class CompilationEngine : IDisposable
     {
         Write("<term>");
 
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
+        (TokenType type, string value) token = _jackTokenizer.CurrentToken;
         switch (token.type)
         {
             case TokenType.INT_CONST:
-                WriteNode("integerConstant", _jackTokenizer.GetUInt15Constant().ToString());
+                WriteNode("integerConstant", token.value);
                 _jackTokenizer.Advance();
                 break;
             case TokenType.STRING_CONST:
-                WriteNode("stringConstant", _jackTokenizer.GetString());
+                WriteNode("stringConstant", token.value);
                 _jackTokenizer.Advance();
                 break;
-            case TokenType.KEYWORD when IsKeywordConstant(_jackTokenizer.GetKeyword()):
+            case TokenType.KEYWORD when Keyword.IsKeywordConstant(token.value):
                 WriteNode(
                     token.type.ToLowerString(),
-                    _jackTokenizer.GetKeyword().ToLowerString()
+                    token.value
                 );
                 _jackTokenizer.Advance();
                 break;
-            case TokenType.IDENTIFIER when !(_jackTokenizer.Peek().type is TokenType.SYMBOL && _jackTokenizer.Peek().value is "." or "("):
+            case TokenType.IDENTIFIER when !(_jackTokenizer.Peek().type is TokenType.SYMBOL && _jackTokenizer.Peek().value is Symbols.DOT or Symbols.OPENING_PARENTHESIS):
                 WriteNode(
                     TokenType.IDENTIFIER.ToLowerString(),
                     _jackTokenizer.GetIdentifier()
@@ -1166,7 +634,7 @@ internal class CompilationEngine : IDisposable
 
                 token = _jackTokenizer.CurrentToken;
 
-                if (token.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is "[")
+                if (token.type is TokenType.SYMBOL && token.value is Symbols.OPENING_BRACKET)
                 {
                     WriteNode(
                         TokenType.SYMBOL.ToLowerString(),
@@ -1177,26 +645,17 @@ internal class CompilationEngine : IDisposable
 
                     CompileExpression();
 
-                    token = _jackTokenizer.CurrentToken;
-
-                    if (token.type is not TokenType.SYMBOL && _jackTokenizer.GetSymbol() is not "]")
-                    {
-                        throw new FormatExceptionBuilder()
-                            .AddUnexpected(token.type, token.rawValue)
-                            .AddExpected(TokenType.SYMBOL, "]")
-                            .Build();
-                    }
-
-                    WriteNode(
-                        TokenType.SYMBOL.ToLowerString(),
-                        _jackTokenizer.GetSymbol()
+                    Consume(
+                        expectedNodeType: TokenType.SYMBOL,
+                        expectedValues: [Symbols.CLOSING_BRACKET],
+                        isStartWithAdvance: false
                     );
 
                     _jackTokenizer.Advance();
                 }
                 break;
-            case TokenType.SYMBOL when _jackTokenizer.GetSymbol() is "(" or "-" or "~":
-                if (_jackTokenizer.GetSymbol() is "(")
+            case TokenType.SYMBOL when _jackTokenizer.GetSymbol() is Symbols.OPENING_PARENTHESIS or Symbols.MINUS or Symbols.TILDE:
+                if (_jackTokenizer.GetSymbol() is Symbols.OPENING_PARENTHESIS)
                 {
                     WriteNode(
                         TokenType.SYMBOL.ToLowerString(),
@@ -1207,19 +666,10 @@ internal class CompilationEngine : IDisposable
 
                     CompileExpression();
 
-                    token = _jackTokenizer.CurrentToken;
-
-                    if (token.type is not TokenType.SYMBOL && _jackTokenizer.GetSymbol() is not ")")
-                    {
-                        throw new FormatExceptionBuilder()
-                            .AddUnexpected(token.type, token.rawValue)
-                            .AddExpected(TokenType.SYMBOL, ")")
-                            .Build();
-                    }
-
-                    WriteNode(
-                        TokenType.SYMBOL.ToLowerString(),
-                        _jackTokenizer.GetSymbol()
+                    Consume(
+                        expectedNodeType: TokenType.SYMBOL,
+                        expectedValues: [Symbols.CLOSING_PARENTHESIS],
+                        isStartWithAdvance: false
                     );
 
                     _jackTokenizer.Advance();
@@ -1236,7 +686,7 @@ internal class CompilationEngine : IDisposable
                     CompileTerm();
                 }
                 break;
-            case TokenType.IDENTIFIER when _jackTokenizer.Peek().type is TokenType.SYMBOL && _jackTokenizer.Peek().value is "." or "(":
+            case TokenType.IDENTIFIER when _jackTokenizer.Peek().type is TokenType.SYMBOL && _jackTokenizer.Peek().value is Symbols.DOT or Symbols.OPENING_PARENTHESIS:
                 WriteNode(
                     TokenType.IDENTIFIER.ToLowerString(),
                     _jackTokenizer.GetIdentifier()
@@ -1244,28 +694,17 @@ internal class CompilationEngine : IDisposable
 
                 _jackTokenizer.Advance();
 
-                if (_jackTokenizer.GetSymbol() is ".")
+                token = _jackTokenizer.CurrentToken;
+
+                if (token.value is Symbols.DOT)
                 {
                     WriteNode(
                         TokenType.SYMBOL.ToLowerString(),
                         _jackTokenizer.GetSymbol()
                     );
 
-                    _jackTokenizer.Advance();
-
-                    token = _jackTokenizer.CurrentToken;
-
-                    if (token.type is not TokenType.IDENTIFIER)
-                    {
-                        throw new FormatExceptionBuilder()
-                            .AddUnexpected(token.type)
-                            .AddExpected(TokenType.IDENTIFIER)
-                            .Build();
-                    }
-
-                    WriteNode(
-                        TokenType.IDENTIFIER.ToLowerString(),
-                        _jackTokenizer.GetIdentifier()
+                    Consume(
+                        expectedNodeType: TokenType.IDENTIFIER
                     );
 
                     _jackTokenizer.Advance();
@@ -1280,19 +719,10 @@ internal class CompilationEngine : IDisposable
 
                 CompileExpressionList();
 
-                token = _jackTokenizer.CurrentToken;
-
-                if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ")")
-                {
-                    throw new FormatExceptionBuilder()
-                        .AddUnexpected(token.type, token.rawValue)
-                        .AddExpected(TokenType.SYMBOL, ")")
-                        .Build();
-                }
-
-                WriteNode(
-                    TokenType.SYMBOL.ToLowerString(),
-                    _jackTokenizer.GetSymbol()
+                Consume(
+                    expectedNodeType: TokenType.SYMBOL,
+                    expectedValues: [Symbols.CLOSING_PARENTHESIS],
+                    isStartWithAdvance: false
                 );
 
                 _jackTokenizer.Advance();
@@ -1312,14 +742,14 @@ internal class CompilationEngine : IDisposable
         int count = 0;
         Write("<expressionList>");
 
-        (TokenType type, string rawValue) token = _jackTokenizer.CurrentToken;
-        while(token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ")")
+        (TokenType type, string value) token = _jackTokenizer.CurrentToken;
+        while (token.type is not TokenType.SYMBOL || token.value is not Symbols.CLOSING_PARENTHESIS)
         {
             count ++;
             CompileExpression();
 
             token = _jackTokenizer.CurrentToken;
-            if (token.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
+            if (token.type is TokenType.SYMBOL && token.value is Symbols.COMMA)
             {
                 WriteNode(
                     TokenType.SYMBOL.ToLowerString(),
@@ -1346,24 +776,95 @@ internal class CompilationEngine : IDisposable
         _outputWriter.WriteLine($"<{nodeType}> {value} </{nodeType}>");
     }
 
-    private static bool IsPrimitiveType(Keyword keyword)
+    private void WriteNode<TNode>(TNode nodeType, string value)
+        where TNode : struct, Enum
     {
-        return keyword is Keyword.INT or Keyword.BOOLEAN or Keyword.CHAR;
+        _outputWriter.WriteLine($"<{nodeType.ToLowerString()}> {value} </{nodeType.ToLowerString()}>");
     }
 
-    private static bool IsStatementKeyword(Keyword keyword)
+    private void Consume(
+        TokenType expectedNodeType,
+        string[]? expectedValues = null,
+        bool isStartWithAdvance = true
+    )
     {
-        return keyword is Keyword.LET or Keyword.IF or Keyword.WHILE or Keyword.DO or Keyword.RETURN;
+        if (isStartWithAdvance)
+        {
+            _jackTokenizer.Advance();
+        }
+
+        expectedValues ??= Array.Empty<string>();
+
+        var token = _jackTokenizer.CurrentToken;
+
+        if (expectedNodeType != token.Type || (expectedValues.Length > 0 && !expectedValues.Contains(token.RawValue)))
+        {
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.Type, token.RawValue)
+                .AddExpected(expectedNodeType, expectedValues)
+                .Build();
+        }
+
+        WriteNode(token.Type, token.RawValue);
     }
 
-    private static bool IsKeywordConstant(Keyword keyword)
+    private void ConsumeWhile(
+        Func<TokenType, string, bool> predicate,
+        Action action,
+        bool isStartWithAdvance = true
+    )
     {
-        return keyword is Keyword.TRUE or Keyword.FALSE or Keyword.NULL or Keyword.THIS;
+        if (isStartWithAdvance)
+        {
+            _jackTokenizer.Advance();
+        }
+
+        (TokenType type, string value) token = _jackTokenizer.CurrentToken;
+
+        while (predicate(token.type, token.value))
+        {
+            action();
+            _jackTokenizer.Advance();
+            token = _jackTokenizer.CurrentToken;
+        }
     }
 
-    private static bool IsValidOperator(string op)
+    private void ConsumeIdentifierOrKeyword(
+        string[] expectedKeywords,
+        bool isStartWithAdvance = true
+    )
     {
-        return op is "+" or "-" or "*" or "/" or "&amp;" or "|" or "&lt;" or "&gt;" or "=";
+        if (isStartWithAdvance)
+        {
+            _jackTokenizer.Advance();
+        }
+
+        (TokenType type, string value) token = _jackTokenizer.CurrentToken;
+
+        if (token.type is not (TokenType.KEYWORD or TokenType.IDENTIFIER))
+        {
+            throw new FormatExceptionBuilder()
+                .AddUnexpected(token.type, token.value)
+                .AddExpected(TokenType.KEYWORD)
+                .AddExpected(TokenType.IDENTIFIER)
+                .Build();
+        }
+        else if (token.type is TokenType.KEYWORD)
+        {
+            if (!expectedKeywords.Contains(token.value))
+            {
+                throw new FormatExceptionBuilder()
+                    .AddUnexpected(token.type, token.value)
+                    .AddExpected(TokenType.KEYWORD, [
+                        Keyword.INT,
+                        Keyword.BOOLEAN,
+                        Keyword.CHAR
+                    ])
+                    .Build();
+            }
+        }
+
+        WriteNode(token.type, token.value);
     }
 
     public void Dispose()
