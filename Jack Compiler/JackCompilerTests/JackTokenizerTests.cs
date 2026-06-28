@@ -39,7 +39,7 @@ public class JackTokenizerTests
     [DataRow(139, TokenType.SYMBOL, "}")]
     [DataRow(3, TokenType.KEYWORD, "function")]
     [DataRow(104, TokenType.IDENTIFIER, "i")]
-    [DataRow(89, TokenType.SYMBOL, "<")]
+    [DataRow(89, TokenType.SYMBOL, "&lt;")]
     [DataRow(86, TokenType.KEYWORD, "while")]
     [DataRow(137, TokenType.SYMBOL, ";")]
     [DataRow(73, TokenType.INT_CONST, "1")]

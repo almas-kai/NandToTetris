@@ -81,7 +81,7 @@ internal class CompilationEngine : IDisposable
         {
             WriteNode(
                 TokenType.IDENTIFIER.ToLowerString(),
-                _jackTokenizer.GetIdentifier()
+                token.value
             );
 
             _jackTokenizer.Advance();
@@ -174,7 +174,7 @@ internal class CompilationEngine : IDisposable
 
             token = _jackTokenizer.CurrentToken;
 
-            if (token.type is TokenType.SYMBOL && _jackTokenizer.GetSymbol() is ",")
+            if (token.type is TokenType.SYMBOL && token.value is Symbol.COMMA)
             {
                 // You could give out token itself here.
                 WriteNode(
@@ -242,7 +242,7 @@ internal class CompilationEngine : IDisposable
         {
             WriteNode(
                 token.type.ToLowerString(),
-                _jackTokenizer.GetIdentifier()
+                token.value
             );
 
             _jackTokenizer.Advance();
@@ -252,7 +252,7 @@ internal class CompilationEngine : IDisposable
             {
                 WriteNode(
                     token.type.ToLowerString(),
-                    _jackTokenizer.GetSymbol()
+                    token.value
                 );
                 _jackTokenizer.Advance();
                 token = _jackTokenizer.CurrentToken;
@@ -342,18 +342,18 @@ internal class CompilationEngine : IDisposable
 
         (TokenType type, string value) token = _jackTokenizer.CurrentToken;
 
-        if (token.type is not TokenType.SYMBOL || _jackTokenizer.GetSymbol() is not ("]" or ";"))
+        if (token.type is not TokenType.SYMBOL || token.value is not (Symbol.CLOSING_BRACKET or Symbol.SEMICOLON))
         {
             throw new FormatExceptionBuilder()
                 .AddUnexpected(token.type, token.value)
-                .AddExpected(TokenType.SYMBOL, "]", ";")
+                .AddExpected(TokenType.SYMBOL, Symbol.CLOSING_BRACKET, Symbol.SEMICOLON)
                 .Build();
         }
-        else if (_jackTokenizer.GetSymbol() is "]")
+        else if (token.value is Symbol.CLOSING_BRACKET)
         {
             WriteNode(
                 TokenType.SYMBOL.ToLowerString(),
-                _jackTokenizer.GetSymbol()
+                token.value
             );
 
             Consume(
@@ -584,11 +584,11 @@ internal class CompilationEngine : IDisposable
             (TokenType type, string value) token = _jackTokenizer.CurrentToken;
 
             // Remove GetSymbol, rework the tokenizer.
-            if (token.type is TokenType.SYMBOL && Symbol.IsValidOperator(_jackTokenizer.GetSymbol()))
+            if (token.type is TokenType.SYMBOL && Symbol.IsValidOperator(token.value))
             {
                 WriteNode(
                     TokenType.SYMBOL.ToLowerString(),
-                    _jackTokenizer.GetSymbol()
+                    token.value
                 );
 
                 _jackTokenizer.Advance();
@@ -627,7 +627,7 @@ internal class CompilationEngine : IDisposable
             case TokenType.IDENTIFIER when !(_jackTokenizer.Peek().type is TokenType.SYMBOL && _jackTokenizer.Peek().value is Symbol.DOT or Symbol.OPENING_PARENTHESIS):
                 WriteNode(
                     TokenType.IDENTIFIER.ToLowerString(),
-                    _jackTokenizer.GetIdentifier()
+                    token.value
                 );
 
                 _jackTokenizer.Advance();
@@ -638,7 +638,7 @@ internal class CompilationEngine : IDisposable
                 {
                     WriteNode(
                         TokenType.SYMBOL.ToLowerString(),
-                        _jackTokenizer.GetSymbol()
+                        token.value
                     );
 
                     _jackTokenizer.Advance();
@@ -654,12 +654,12 @@ internal class CompilationEngine : IDisposable
                     _jackTokenizer.Advance();
                 }
                 break;
-            case TokenType.SYMBOL when _jackTokenizer.GetSymbol() is Symbol.OPENING_PARENTHESIS or Symbol.MINUS or Symbol.TILDE:
-                if (_jackTokenizer.GetSymbol() is Symbol.OPENING_PARENTHESIS)
+            case TokenType.SYMBOL when token.value is Symbol.OPENING_PARENTHESIS or Symbol.MINUS or Symbol.TILDE:
+                if (token.value is Symbol.OPENING_PARENTHESIS)
                 {
                     WriteNode(
                         TokenType.SYMBOL.ToLowerString(),
-                        _jackTokenizer.GetSymbol()
+                        token.value
                     );
 
                     _jackTokenizer.Advance();
@@ -678,7 +678,7 @@ internal class CompilationEngine : IDisposable
                 {
                     WriteNode(
                         TokenType.SYMBOL.ToLowerString(),
-                        _jackTokenizer.GetSymbol()
+                        token.value
                     );
                     
                     _jackTokenizer.Advance();
@@ -689,7 +689,7 @@ internal class CompilationEngine : IDisposable
             case TokenType.IDENTIFIER when _jackTokenizer.Peek().type is TokenType.SYMBOL && _jackTokenizer.Peek().value is Symbol.DOT or Symbol.OPENING_PARENTHESIS:
                 WriteNode(
                     TokenType.IDENTIFIER.ToLowerString(),
-                    _jackTokenizer.GetIdentifier()
+                    token.value
                 );
 
                 _jackTokenizer.Advance();
@@ -700,7 +700,7 @@ internal class CompilationEngine : IDisposable
                 {
                     WriteNode(
                         TokenType.SYMBOL.ToLowerString(),
-                        _jackTokenizer.GetSymbol()
+                        token.value
                     );
 
                     Consume(
@@ -710,9 +710,11 @@ internal class CompilationEngine : IDisposable
                     _jackTokenizer.Advance();
                 }
 
+                token = _jackTokenizer.CurrentToken;
+
                 WriteNode(
                     TokenType.SYMBOL.ToLowerString(),
-                    _jackTokenizer.GetSymbol()
+                    token.value
                 );
 
                 _jackTokenizer.Advance();
@@ -753,7 +755,7 @@ internal class CompilationEngine : IDisposable
             {
                 WriteNode(
                     TokenType.SYMBOL.ToLowerString(),
-                    _jackTokenizer.GetSymbol()
+                    token.value
                 );
 
                 _jackTokenizer.Advance();

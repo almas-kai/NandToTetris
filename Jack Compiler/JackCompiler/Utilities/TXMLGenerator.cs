@@ -26,16 +26,16 @@ internal static class TXMLGenerator
                         writer.WriteLine($"<keyword> {token.value} </keyword>");
                         break;
                     case TokenType.SYMBOL:
-                        writer.WriteLine($"<symbol> {jackTokenizer.GetSymbol()} </symbol>");
+                        writer.WriteLine($"<symbol> {token.value} </symbol>");
                         break;
                     case TokenType.IDENTIFIER:
-                        writer.WriteLine($"<identifier> {jackTokenizer.GetIdentifier()} </identifier>");
+                        writer.WriteLine($"<identifier> {token.value} </identifier>");
                         break;
                     case TokenType.INT_CONST:
-                        writer.WriteLine($"<integerConstant> {jackTokenizer.GetUInt15Constant()} </integerConstant>");
+                        writer.WriteLine($"<integerConstant> {token.value} </integerConstant>");
                         break;
                     case TokenType.STRING_CONST:
-                        writer.WriteLine($"<stringConstant> {jackTokenizer.GetString()} </stringConstant>");
+                        writer.WriteLine($"<stringConstant> {token.value} </stringConstant>");
                         break;
                     default:
                         throw new FormatException($"Cannot generate testing XML file. Unrecognized token type: \"{token.type}\".");

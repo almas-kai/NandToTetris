@@ -58,68 +58,6 @@ internal class JackTokenizer
             throw new InvalidOperationException($"Couldn't match the token. Unrecognized token type. Token type is: \"{token.type}\", token value is: \"{token.value}\".");
         }
     }
-    public string GetSymbol()
-    {
-        if (CurrentToken.Type is not TokenType.SYMBOL || CurrentToken.RawValue.Length != 1)
-        {
-            throw new InvalidOperationException($"Cannot get the symbol, token type is not symbol or the parsing instruction value is incorrect. The token type is \"{CurrentToken.Type}\", and token value is \"{CurrentToken.RawValue}\".");
-        }
-
-        switch (CurrentToken.RawValue)
-        {
-            case "<":
-                return "&lt;";
-            case ">":
-                return "&gt;";
-            case "&":
-                return "&amp;";
-            case "\"":
-                return "&quot;";
-            default:
-                return CurrentToken.RawValue;
-        }
-    }
-    public string GetIdentifier()
-    {
-        if (CurrentToken.Type is not TokenType.IDENTIFIER)
-        {
-            throw new InvalidOperationException($"Cannot get the identifier, token type is not identifier. The token type is \"{CurrentToken.Type}\".");
-        }
-
-        return CurrentToken.RawValue;
-    }
-    public int GetUInt15Constant()
-    {
-        if (CurrentToken.Type is not TokenType.INT_CONST)
-        {
-            throw new InvalidOperationException($"Cannot get the integer constant, token type is not integer constant. The token type is \"{CurrentToken.Type}\".");
-        }
-
-        if (int.TryParse(CurrentToken.RawValue, out int intConst))
-        {
-            if (intConst >= 0 && intConst <= 32767)
-            {
-                return intConst;
-            }
-            else
-            {
-                throw new InvalidOperationException($"Cannot get the integer constant, it has to be 0 <= x <= 32767. But it was: \"{intConst}\".");
-            }
-        }
-        else
-        {
-            throw new InvalidOperationException($"Cannot get the integer constant, it is not an integer constant. It is: \"{CurrentToken.RawValue}\".");
-        }
-    }
-    public string GetString()
-    {
-        if (CurrentToken.Type is not TokenType.STRING_CONST)
-        {
-            throw new InvalidOperationException($"Cannot get the string constant, token type is not a string constant. The token type is: \"{CurrentToken.Type}\".");
-        }
-
-        return CurrentToken.RawValue;
-    }
     public (TokenType type, string value) Peek()
     {
         if (HasMoreTokens is false)
@@ -184,6 +122,21 @@ internal class JackTokenizer
                         break;
                     case 1:
                         tokenType = TokenType.SYMBOL;
+                        switch (tokenValue)
+                        {
+                            case "<":
+                                tokenValue = "&lt;";
+                                break;
+                            case ">":
+                                tokenValue = "&gt;";
+                                break;
+                            case "&":
+                                tokenValue = "&amp;";
+                                break;
+                            case "\"":
+                                tokenValue = "&quot;";
+                                break;
+                        }
                         break;
                     case 2:
                         tokenType = TokenType.INT_CONST;
