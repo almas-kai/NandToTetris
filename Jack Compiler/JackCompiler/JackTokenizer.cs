@@ -29,69 +29,45 @@ internal class JackTokenizer
     }
     public void Advance()
     {
-        if (HasMoreTokens is false)
-        {
-            throw new InvalidOperationException("Cannot advance. There are no more instructions.");
-        }
-
-    SpaceLabel:
-        if (_currentInstruction == string.Empty)
-        {
-            _currentInstruction = _instructionsQueue.Dequeue();
-        }
-        Match tokenMatch = _MatchToken(_currentInstruction, out (TokenType type, string value) token);
-
-        if (tokenMatch.Success && token.type is not TokenType.UNKNOWN)
-        {
-            _currentInstruction = _currentInstruction.Remove(0, tokenMatch.Value.Length);
-            if (token.type == TokenType.SPACE)
-            {
-                goto SpaceLabel;
-            }
-            else
-            {
-                CurrentToken = token;
-            }
-        }
-        else
-        {
-            throw new InvalidOperationException($"Couldn't match the token. Unrecognized token type. Token type is: \"{token.type}\", token value is: \"{token.value}\".");
-        }
+        CurrentToken = GetNextToken(isDequeue: true);
     }
     public (TokenType type, string value) Peek()
     {
-        if (HasMoreTokens is false)
-        {
-            throw new InvalidOperationException("There are no instructions to peek.");
-        }
+        return GetNextToken(isDequeue: false);
+    }
 
+    private (TokenType type, string value) GetNextToken(bool isDequeue)
+    {
         string currentInstruction = _currentInstruction;
 
-    peekLabel:
-        if (currentInstruction == string.Empty)
+        while(HasMoreTokens)
         {
-            currentInstruction = _instructionsQueue.Peek();
-        }
-
-        Match peekMatch = _MatchToken(currentInstruction, out (TokenType type, string value) token);
-
-        if (peekMatch.Success && token.type is not TokenType.UNKNOWN)
-        {
-            currentInstruction = currentInstruction.Remove(0, peekMatch.Value.Length);
-
-            if (token.type == TokenType.SPACE)
+            if (currentInstruction == string.Empty)
             {
-                goto peekLabel;
+                currentInstruction = isDequeue ? _instructionsQueue.Dequeue() : _instructionsQueue.Peek();
             }
-            else
+
+            Match tokenMatch = _MatchToken(currentInstruction, out (TokenType type, string value) token);
+
+            if (!(tokenMatch.Success && token.type is not TokenType.UNKNOWN))
             {
-                return (token.type, token.value);
+                throw new InvalidOperationException($"Couldn't match the token. Unrecognized token type. Token type is: \"{token.type}\", token value is: \"{token.value}\".");
+            }
+
+            currentInstruction = currentInstruction.Remove(0, tokenMatch.Value.Length);
+
+            if (token.type is not TokenType.SPACE)
+            {
+                if (isDequeue)
+                {
+                    _currentInstruction = currentInstruction;
+                }
+
+                return token;
             }
         }
-        else
-        {
-            throw new InvalidOperationException($"Couldn't peek. Unrecognized token type. Token type is \"{token.type}\", and token value is \"{token.value}\".");
-        }
+
+        throw new InvalidOperationException("Cannot read the next instruction. It does not exist.");
     }
 
     private Match _MatchToken(string instruction, out (TokenType type, string value) token)
