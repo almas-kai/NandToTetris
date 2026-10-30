@@ -7,6 +7,14 @@ namespace JackCompiler;
 
 internal class JackTokenizer
 {
+    private static readonly (TokenType, Func<string, Match>)[] s_tokenTypeMatchers =
+    {
+        (TokenType.KEYWORD, CompilerRegex.IsKeyword),
+        (TokenType.SYMBOL, CompilerRegex.IsSymbol),
+        (TokenType.INT_CONST, CompilerRegex.IsIntegerConstant),
+        (TokenType.STRING_CONST, CompilerRegex.IsStringConstant),
+        (TokenType.IDENTIFIER, CompilerRegex.IsIdentifier)
+    };
     private readonly Queue<string> _instructionsQueue;
     private string _currentInstruction = string.Empty;
     public (TokenType Type, string RawValue) CurrentToken { get; private set; }
@@ -83,50 +91,16 @@ internal class JackTokenizer
             CompilerRegex.IsIdentifier
         };
 
-        for (int i = 0; i < tokenTypeMatchers.Length; i++)
+        foreach((TokenType Type, Func<string, Match> Match) tokenTypeMatcher in s_tokenTypeMatchers)
         {
-            Func<string, Match> matcher = tokenTypeMatchers[i];
-            Match tempMatch = matcher.Invoke(instruction);
-            if (tempMatch.Success && tempMatch.Index == 0)
+            Match tempMatch = tokenTypeMatcher.Match(instruction);
+
+            if (tempMatch.Success && tempMatch.Index is 0)
             {
-                tokenValue = tempMatch.Value;
+                tokenType = tokenTypeMatcher.Type;
+                tokenValue = NormalizeTokenValue(tokenType, tempMatch.Value);
                 match = tempMatch;
-                switch (i)
-                {
-                    case 0:
-                        tokenType = TokenType.KEYWORD;
-                        break;
-                    case 1:
-                        tokenType = TokenType.SYMBOL;
-                        switch (tokenValue)
-                        {
-                            case "<":
-                                tokenValue = "&lt;";
-                                break;
-                            case ">":
-                                tokenValue = "&gt;";
-                                break;
-                            case "&":
-                                tokenValue = "&amp;";
-                                break;
-                            case "\"":
-                                tokenValue = "&quot;";
-                                break;
-                        }
-                        break;
-                    case 2:
-                        tokenType = TokenType.INT_CONST;
-                        break;
-                    case 3:
-                        tokenType = TokenType.STRING_CONST;
-                        tokenValue = tokenValue.Trim('"');
-                        break;
-                    case 4:
-                        tokenType = TokenType.IDENTIFIER;
-                        break;
-                    default:
-                        throw new InvalidOperationException("Unrecognized token type.");
-                }
+
                 break;
             }
         }
@@ -142,4 +116,18 @@ internal class JackTokenizer
 
         return match;
     }
+
+    private static string NormalizeTokenValue(TokenType type, string rawValue) => type switch
+    {
+        TokenType.SYMBOL => rawValue switch
+        {
+            "<" => "&lt;",
+            ">" => "&gt;",
+            "&" => "&amp;",
+            "\"" => "&quot;",
+            _ => rawValue
+        },
+        TokenType.STRING_CONST => rawValue.Trim('"'),
+        _ => rawValue
+    };
 }

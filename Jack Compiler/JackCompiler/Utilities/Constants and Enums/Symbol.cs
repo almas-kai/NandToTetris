@@ -20,7 +20,12 @@ internal static class Symbol
     public const string PIPE = "|";
     public const string LESS_THAN = "&lt;";
     public const string GREATER_THAN = "&gt;";
+    public const string QUOTE = "&quot;";
     public const string TILDE = "~";
+    private const string _LESS_THAN = "<";
+    private const string _GREATER_THAN = ">";
+    private const string _AMPERSAND = "&";
+    private const string _QUOTE = "\"";
 
     public static bool IsValidOperator(string symbol)
     {
@@ -36,4 +41,18 @@ internal static class Symbol
             EQUAL
         );
     }
+
+    public static string NormalizeTokenValue(TokenType type, string rawValue) => type switch
+    {
+        TokenType.SYMBOL => rawValue switch
+        {
+            _LESS_THAN => LESS_THAN,
+            _GREATER_THAN => GREATER_THAN,
+            _AMPERSAND => AMPERSAND,
+            _QUOTE => QUOTE,
+            _ => rawValue
+        },
+        TokenType.STRING_CONST => rawValue.Trim(_QUOTE[0]),
+        _ => rawValue
+    };
 }
